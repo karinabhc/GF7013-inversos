@@ -18,8 +18,6 @@ self.draw(): produces a numpy array with realizations of the distribution.
 from .pdf_base import pdf_base
 import numpy as np
 
-COMPLETAR = None
-
 class pdf_uniform_nD(pdf_base):
     """
     Defines a class for a n-dimensinoal uniform probability density function.
