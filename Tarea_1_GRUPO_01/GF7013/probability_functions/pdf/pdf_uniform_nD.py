@@ -65,8 +65,9 @@ class pdf_uniform_nD(pdf_base):
             self.LogZero = LogOfZero
 
         # compute normalization constant
-        self.normalization = COMPLETAR
-        self.log_normalization = COMPLETAR
+        
+        self.normalization = 1.0 / np.prod(self.ul - self.ll)
+        self.log_normalization = self.LogZero + np.log(self.normalization)
     
     ####
     def __check_x(self, x):
@@ -89,9 +90,8 @@ class pdf_uniform_nD(pdf_base):
         x must be a numpy array of 1 D.
         """
         x = self.__check_x(x)
-
-        if COMPLETAR:
-            return 0
+        if x >= self.ll and x <= self.ul:
+            return 0.0
         else:
             return self.LogZero
 
@@ -100,11 +100,11 @@ class pdf_uniform_nD(pdf_base):
         """
         computes the likelihood of the vector value x. 
         x must be a numpy array of 1 D.
-        
+        SI UN ELEMENTO ESTA FUERA DEL RANGO ES 0
         """
         x = self.__check_x(x)
  
-        if COMPLETAR:
+        if x >= self.ll and x <= self.ul:
             return 1.0
         else:
             return 0.0
@@ -144,7 +144,20 @@ class pdf_uniform_nD(pdf_base):
 
         
         """
-        sample = COMPLETAR
-        
-        return sample
-           
+        # generar xi = a + (b-a) * u, donde u es una variable aleatoria uniforme entre 0 y 1
+        # y xi es la variable aleatoria uniforme entre a y b
+        if Ns is None:
+            # Generate a single sample (1D array) using the inverse method  with the shape of self.ll 
+            u = self.rng.uniform(0.0, 1.0, size=self.N)
+            return self.ll + (self.ul - self.ll) * u
+        else:
+            # Generate Ns samples (2D array) using the inverse method where the number of rows
+            #is the length of self.ll and the number of columns is Ns 
+            #u = self.rng.uniform(0.0, 1.0, size=(Ns, self.N))
+            #return self.ll + (self.ul - self.ll) * u
+            # Generate a 2D array of shape (Ns, self.N) using the inverse method
+            samples = [self.ll + (self.ul - self.ll) * self.rng.uniform(0.0, 1.0, size=self.N)
+                                                                            for _ in range(Ns)]
+            samples = np.array(samples, dtype=float).T
+            print(samples.shape)
+            return samples

@@ -109,8 +109,12 @@ class pmf_multinomial(pmf_base):
                 # use a single recursion to compute Ns samples.
                 sample = NP.array([self._draw(Ns=None) for i in range(Ns)])
         elif self.method == 'analog':
-            # VER NOTAS DE CLASES
-            COMPLETAR = None
+            # Vectorizado: generar Ns muestras, si Ns es None tambien se genera 1 sola muestra
+             # u = 1 - U[0, 1) <=> u =  U]0, 1]
+            u = 1- self.rng.random(size=Ns) # equivale a uniform(0, 1, size=Ns)
+            right_limit = NP.cumsum(self.prob)
+            indices = NP.searchsorted(right_limit, u)
+            sample = self.values[indices]
 
         else:
             raise ValueError("par['method'] should be 'numpy' or 'analog'")
