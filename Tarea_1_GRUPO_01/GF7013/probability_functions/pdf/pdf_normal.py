@@ -18,8 +18,6 @@ self.draw(N = None): produces  realizations of the distribution.
 from .pdf_base import pdf_base
 import numpy as np
 
-COMPLETAR = None
-
 class pdf_normal(pdf_base):
     """
     Defines a class for a n-dimensional multivariate normal N(mu, cov) probability 
@@ -56,8 +54,8 @@ class pdf_normal(pdf_base):
         # compute normalization constant and base e logarithm of normalization.
         # (see self._pdf)
         sign, logdetCov = np.linalg.slogdet(self.cov)
-        self.log_normalization = COMPLETAR
-        self.normalization = COMPLETAR
+        self.log_normalization = -0.5 * (self.N * np.log(2 * np.pi) + logdetCov)
+        self.normalization = np.exp(self.log_normalization)
 
         if self.normalization < 1E3 * np.finfo(float).eps:
            print('Floating point overflow when calculating the '
@@ -92,8 +90,8 @@ class pdf_normal(pdf_base):
 
         """
         x = self.__check_x(x)
-        misfit = COMPLETAR
-        log_likelihood_value = COMPLETAR
+        misfit = x - self.mu
+        log_likelihood_value =-0.5 * misfit.T @ self.inv_cov @ misfit #prod matricial
         return log_likelihood_value
         
     ####
@@ -105,9 +103,9 @@ class pdf_normal(pdf_base):
         TODO: A hint: use what you already coded!. 
         
         """
-        LogLike = COMPLETAR
+        LogLike = self._log_likelihood(x)
 
-        return COMPLETAR
+        return  np.exp(LogLike)
     
     ####
     def _log_pdf(self, x):
@@ -140,8 +138,23 @@ class pdf_normal(pdf_base):
 
         """
         
-        u = COMPLETAR
-        sample = COMPLETAR
+        if Ns is None:
+            u = self.rng.standard_normal(self.N)
+            sample = self.mu + self.right_chol_cov @ u
+        else:
+          # u = self.rng.standard_normal((self.N, Ns))
+          # sample = self.mu.reshape(-1, 1) + self.right_chol_cov @ u
+               
+            #VERSION PASITO A PASITO 
+            # Para varias muestras se crea una matriz para almacenarlas
+            sample = np.zeros((self.N, Ns))
+            
+            for j in range(Ns):
+                # Generamos un vector de N(0,1)
+                u = self.rng.standard_normal(self.N)
+                
+                # transformación y = mu + A·x para cada columna jejeje
+                sample[:, j] = self.mu + np.dot(self.right_chol_cov, u)
+        
         return sample
-           
            
