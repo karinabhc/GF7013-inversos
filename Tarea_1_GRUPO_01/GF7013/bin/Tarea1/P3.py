@@ -27,7 +27,7 @@ import GF7013
 from GF7013.probability_functions import pdf
 
 # defina funciones acá
-def create_histogram2D(samples, suptitle, figsize=(12, 8), bins_2d=50, bins_xs=100, cmap='viridis'):
+def create_histogram2D(samples, suptitle, figsize=(14, 8), bins_2d=50, bins_xs=100, cmap='viridis'):
     """
     Función para crear los histogramas 2D y 1D de las muestras x1 y x2 en  subplots diferentes
     """
@@ -38,32 +38,33 @@ def create_histogram2D(samples, suptitle, figsize=(12, 8), bins_2d=50, bins_xs=1
     
     # Create 2D histogram (lower left [1, 0])
     counts, xedges, yedges, im = axs[1, 0].hist2d(x1, x2, bins=bins_2d, cmap=cmap)
-    fig.colorbar(im, ax=axs[1, 0],label='N Muestras', location='bottom', orientation='horizontal', fontsize=15)
-    axs[1, 0].set_title('Histograma Marginal 2D (FDP Conjunta)', fontsize=16)
-    axs[1, 0].set_xlabel(r'$X_1$', fontsize=15)
-    axs[1, 0].set_ylabel(r'$X_2$', fontsize=15)
+    cb = fig.colorbar(im, ax=axs[1, 0], location='bottom', orientation='horizontal')
+    cb.set_label(label='N Muestras', fontsize=16)
+    axs[1, 0].set_title('Histograma Marginal 2D (FDP Conjunta)', fontsize=18)
+    axs[1, 0].set_xlabel(r'$X_1$', fontsize=17)
+    axs[1, 0].set_ylabel(r'$X_2$', fontsize=17)
 
     # Marginal histogram for $X_1$ (upper left [0, 0])
     x1_hist, x1_bins, _ = axs[0, 0].hist(x1, bins=bins_xs, density=True, alpha=0.6, color='blue', label='Histograma')
     x1_pdf = (1 / np.sqrt(2 * np.pi * C[0, 0])) * np.exp(-0.5 * ((x1_bins - mu[0]) ** 2) / C[0, 0])
     
     # FDP $X_1$
-    axs[0, 0].plot(x1_bins, x1_pdf, color='red', label='FDP')
-    axs[0, 0].set_title(r'Histograma Marginal $X_1$', fontsize=16)
-    axs[0, 0].set_xlabel(r'$X_1$', fontsize=15)
-    axs[0, 0].set_ylabel('Densidad', fontsize=15)
-    axs[0, 0].legend()
+    axs[0, 0].plot(x1_bins, x1_pdf, color='red', label='FDP', lw=3)
+    axs[0, 0].set_title(r'Histograma Marginal $X_1$', fontsize=18)
+    axs[0, 0].set_xlabel(r'$X_1$', fontsize=17)
+    axs[0, 0].set_ylabel('Densidad', fontsize=17)
+    axs[0, 0].legend(fontsize=12)
 
     # Marginal histogram for $X_2$ (lower right [1, 1])
     x2_hist, x2_bins, _ = axs[1, 1].hist(x2, bins=bins_xs, density=True, alpha=0.6, color='green', label='Histograma', orientation='horizontal')
     x2_pdf = (1 / np.sqrt(2 * np.pi * C[1, 1])) * np.exp(-0.5 * ((x2_bins - mu[1]) ** 2) / C[1, 1])
     
-    axs[1, 1].plot(x2_pdf, x2_bins, color='red', label='FDP')
+    axs[1, 1].plot(x2_pdf, x2_bins, color='m', label='FDP', lw=3)
 
-    axs[1, 1].set_title(r'Histograma Marginal $X_2$', fontsize=16)
-    axs[1, 1].set_ylabel(r'$X_2$', fontsize=15)
-    axs[1, 1].set_xlabel('Densidad', fontsize=15)
-    axs[1, 1].legend()
+    axs[1, 1].set_title(r'Histograma Marginal $X_2$', fontsize=18)
+    axs[1, 1].set_ylabel(r'$X_2$', fontsize=17)
+    axs[1, 1].set_xlabel('Densidad', fontsize=17)
+    axs[1, 1].legend(fontsize=12)
     
     # Marginal histogram for $X_1$ and $X_2$ (upper right [0, 1])
     x1_hist, x1_bins, _ = axs[0, 1].hist(x1, bins=bins_xs, density=True, alpha=0.6, color='blue', label=r'Histograma $X_1$')
@@ -72,17 +73,22 @@ def create_histogram2D(samples, suptitle, figsize=(12, 8), bins_2d=50, bins_xs=1
     x2_pdf = (1 / np.sqrt(2 * np.pi * C[1, 1])) * np.exp(-0.5 * ((x2_bins - mu[1]) ** 2) / C[1, 1])
     
     # FDPs
-    axs[0, 1].plot(x1_bins, x1_pdf, color='red', label=r'FDP $X_1$')
-    axs[0, 1].plot(x2_bins, x2_pdf, color='red', label=r'FDP $X_2$',  ls='--')
+    axs[0, 1].plot(x1_bins, x1_pdf, color='red', label=r'FDP $X_1$', lw=3)
+    axs[0, 1].plot(x2_bins, x2_pdf, color='m', label=r'FDP $X_2$', lw=3)
 
-    axs[0, 1].set_title('Histograma Marginales', fontsize=16)
-    axs[0, 1].set_xlabel('X', fontsize=15)
-    axs[0, 1].set_ylabel('Densidad', fontsize=15)
-    axs[0, 1].legend()
+    axs[0, 1].set_title('Histogramas Marginales', fontsize=18)
+    axs[0, 1].set_xlabel('X', fontsize=17)
+    axs[0, 1].set_ylabel('Densidad', fontsize=17)
+    axs[0, 1].legend(fontsize=12)
     
+    axs[0, 0].tick_params(labelsize=15)
+    axs[0, 1].tick_params(labelsize=15)
+    axs[1, 0].tick_params(labelsize=15)
+    axs[1, 1].tick_params(labelsize=15)
+    cb.ax.tick_params(labelsize=15)
     
     fig.suptitle(suptitle, fontsize=20)
-    fig.subplots_adjust(left=0.01)
+    # fig.subplots_adjust(left=0.01)
     return fig
 
 #### SECCION 3.4 
@@ -160,17 +166,15 @@ if __name__ == '__main__':
     samples3 = norm.draw(Ns=Ns3)
     
     # Generate the plots for each set of samples
-    create_histogram2D(samples=samples1, suptitle=f'Distribución Normal Multivariada con N={Ns1:.1e} muestras', figsize=(10, 8))
-    # create_histogram2D(samples=samples2, suptitle=f'Distribución Normal Multivariada con N={Ns2:.1e} muestras')
-    # create_histogram2D(samples=samples3, suptitle=f'Distribución Normal Multivariada con N={Ns3:.1e} muestras')
+    fig1 = create_histogram2D(samples=samples1, suptitle=f'Distribución Normal Multivariada con N={Ns1:.1e} muestras')
+    fig2 =create_histogram2D(samples=samples2, suptitle=f'Distribución Normal Multivariada con N={Ns2:.1e} muestras')
+    fig3 =create_histogram2D(samples=samples3, suptitle=f'Distribución Normal Multivariada con N={Ns3:.1e} muestras')
 
-    
-    
     # prueba test_draw
     resultado_test = test_draw(norm, n_samples=100_000)
     info_test = f'El resultado de test_draw fue {resultado_test}'
     try:
-        assert(resultado_test, info_test) 
+        assert(resultado_test) 
         print('Felicidades, test_draw aprobó el test.')
     except:
         print(info_test)
