@@ -85,13 +85,14 @@ if __name__ == '__main__':
 
     ax.bar(index - width, prob, width, color='blue', label='Probabilidad teórica')
     ax.bar(index, freq_numpy, width, color='red', label='numpy')
-    ax.bar(index + width, freq_analog, width, color='green', label='analog')
+    ax.bar(index + width, freq_analog, width, color='green', label='análogo')
 
     ax.set_xticks(index)
-    ax.set_xticklabels(values, rotation=30)
-    ax.set_title(f'Ns = {Ns:d} samples normalized count v/s probabilities')
-    ax.set_xlabel('Estados discretos')
-    ax.set_ylabel('Probabilidad / Frecuencia')
-    ax.legend()
+    ax.set_xticklabels(values, rotation=30,  fontsize=16)
+    ax.set_title(f'Ns = {Ns:d} muestras normalizada cuenta v/s probabilidades',  fontsize=20)
+    ax.set_xlabel('Estados discretos', fontsize=17)
+    ax.set_ylabel('Probabilidad / Frecuencia',  fontsize=17)
+    ax.legend(fontsize=16)
+    
     plt.tight_layout()
     plt.show()
