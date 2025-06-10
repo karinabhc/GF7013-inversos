@@ -1,1 +1,0 @@
-Se agregó este archivo para que en GitHub la carpeta no fuera ignorada
