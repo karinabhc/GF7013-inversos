@@ -7,7 +7,7 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 
 import numpy as np
 import matplotlib.pyplot as plt
-from datos import obtener_datos_elipses
+from .datos import obtener_datos_elipses
 # importar modulos relevantes del paquete GF7013
 pythonpackagesfolder = '../../../..' # no modificar si no se mueve de carpeta este notebook
 import sys

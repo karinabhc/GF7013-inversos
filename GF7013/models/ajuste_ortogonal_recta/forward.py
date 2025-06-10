@@ -43,7 +43,14 @@ class forward(object):
           -> theta is the orientation of the straight line measured counter-clockwise 
             measured from x axis. 
         """
+        deltas, sigma_deltas, _, _, _ = recta.calc_dist_sigma(
+            m,
+            self.x_obs,
+            self.y_obs,
+            self.sigma_x,
+            self.sigma_y
+        )
 
-        dpred = COMPLETAR
+        dpred = deltas / sigma_deltas
 
         return dpred
