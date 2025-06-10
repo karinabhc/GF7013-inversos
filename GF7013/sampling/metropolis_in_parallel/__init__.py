@@ -1,0 +1,2 @@
+from .metropolis_in_parallel_SERIAL import metropolis_in_parallel_SERIAL
+from .metropolis_in_parallel_POOL import metropolis_in_parallel_POOL
