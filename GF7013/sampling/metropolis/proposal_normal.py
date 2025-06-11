@@ -17,8 +17,6 @@ self.propose(m): returns m_test to be proposed as the next transition in Metropo
 from ...probability_functions.pdf import pdf_normal
 import numpy as np
 
-COMPLETAR = None
-
 class proposal_normal(object):
     """
     Defines a class for a proposal distribution that uses an unbiased n-dimensional 
@@ -37,7 +35,7 @@ class proposal_normal(object):
         pdf_normal_parameters = {}
         pdf_normal_parameters['cov'] = cov
         Npar = cov.shape[0]
-        pdf_normal_parameters['mu'] = COMPLETAR # unbiassed (i.e., null mean)
+        pdf_normal_parameters['mu'] = np.zeros(Npar) # unbiassed (i.e., null mean)
 
         self.pdf = pdf_normal(par= pdf_normal_parameters)
 
@@ -58,7 +56,8 @@ class proposal_normal(object):
 
         """
         # propose the perturbation
-        dm = COMPLETAR
+        
+        dm = self.pdf._draw()
         # check wether the perturbation has the same shape of m, if not, try to reshape
         if not(m.shape == dm.shape):
             try:
