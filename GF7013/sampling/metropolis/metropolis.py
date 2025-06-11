@@ -140,18 +140,18 @@ def metropolis(m0, likelihood_fun, pdf_prior, proposal, num_samples, num_burnin,
             accept = acceptance_criteria(fm_test= fm_post_test, fm= fm_post)
 
             if accept:
-                m = COMPLETAR
-                fm_prior = COMPLETAR
-                fm_like = COMPLETAR
-                fm_post = COMPLETAR
+                m = m_test
+                fm_prior = fm_prior_test
+                fm_like = fm_like_test
+                fm_post = fm_post_test
                 num_accepted_transitions += 1
         # save samples after burn-in period if requested to do so
         if save_samples:
             if k >= num_burnin:
-                samples.m_set[k - num_burnin,:] = COMPLETAR
-                samples.fprior[k - num_burnin] = COMPLETAR
-                samples.like[k - num_burnin] = COMPLETAR
-                samples.f[k - num_burnin] = COMPLETAR
+                samples.m_set[k - num_burnin,:] = m
+                samples.fprior[k - num_burnin] = fm_prior
+                samples.like[k - num_burnin] = fm_like
+                samples.f[k - num_burnin] = fm_post
 
     # compute acceptance ratio of the MCMC chain
     acceptance_ratio = num_accepted_transitions/num_iterations
@@ -172,11 +172,12 @@ def __acceptance_criteria_likelihood(fm, fm_test):
     Returns True if model is accepted, False if not.
     """
     # if likelihood of m_test is larger, do accept.
-    accept = COMPLETAR
+    accept = fm_test >= fm
     # if likelihood is smaller, accept with probability Pac = fm_test/fm
+
     if not(accept):
-        u = COMPLETAR
-        if COMPLETAR:
+        u = np.random.uniform()
+        if u < fm_test/fm:
             accept = True
     
     return accept
@@ -188,11 +189,11 @@ def __acceptance_criteria_log_likelihood(fm, fm_test):
     Returns True if model is accepted, False if not.
     """
     # if likelihood of m_test is larger, do accept.
-    accept = COMPLETAR
+    accept = fm_test >= fm
     # if likelihood is smaller, accept with probability Pac = fm_test/fm
     if not(accept):
-        u = COMPLETAR
-        if COMPLETAR:
+        u = np.random.uniform()
+        if u < np.exp(fm_test - fm):
             accept = True
     
     return accept
