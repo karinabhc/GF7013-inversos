@@ -1,13 +1,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD
+from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
+import matplotlib.gridspec as gridspec
 
+N = 25
+semi_eje_mayor = 8
+semi_eje_menor = 2
+alpha = 45
+delta_x = 0
+delta_y = 4
+desviacion_estandar_x = 1.0
+desviacion_estandar_y = 1.0
 
-
-np.random.seed(0)
-N = 100
-x_obs = np.random.uniform(-10, 10, size=N)
-y_obs = np.random.uniform(-10, 10, size=N)
+x_obs, y_obs, sigma_x, sigma_y = obtener_datos_elipses(
+                                        N = N,
+                                        a = semi_eje_mayor,
+                                        b = semi_eje_menor,
+                                        alpha = alpha,
+                                        deltax = delta_x,
+                                        deltay = delta_y,
+                                        sigma_x = desviacion_estandar_x,
+                                        sigma_y = desviacion_estandar_y)
 
 
 normas = np.sqrt(x_obs**2 + y_obs**2)
@@ -29,34 +43,43 @@ par = {
 
 fprior = pdf_uniform_nD(par)
 
-
 Nsamples = int(1e5)
 samples = fprior.draw(Nsamples)  
 a_samples = samples[0, :]
 theta_samples = samples[1, :]
 
-fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+fig = plt.figure(figsize=(10, 8))
+gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
+                       wspace=0.05, hspace=0.05)
 
-# Histograma conjunto (a, theta)
-ax = axes[0, 0]
-hist = ax.hist2d(a_samples, theta_samples, bins=[100, 100], cmap='viridis')
-plt.colorbar(hist[3], ax=ax)
-ax.set_title("Histograma conjunto de (a, θ)")
-ax.set_xlabel("a")
-ax.set_ylabel("θ (grados)")
+# Histograma conjunto
+ax_join = fig.add_subplot(gs[1, 0])
+counts, xedges, yedges, im = ax_join.hist2d(a_samples, theta_samples, bins=100, cmap='viridis')
+fig.colorbar(im, ax=ax_join, label='Número de muestras')
+ax_join.set_title(r'Histograma Marginal 2D de (a, $\theta$) (FDP Conjunta)')
+ax_join.set_xlabel('a')
+ax_join.set_ylabel(r'$\theta$')
 
-# Histograma marginal de a
-axes[0, 1].hist(a_samples, bins=100, color='steelblue', edgecolor='k')
-axes[0, 1].set_title("Histograma marginal de a")
-axes[0, 1].set_xlabel("a")
+# Marginal para a
+ax_x1 = fig.add_subplot(gs[0, 0], sharex=ax_join)
+x1_hist, _ , _ = ax_x1.hist(a_samples, bins=100, density=True, alpha=0.6, color='blue', label='Histograma de a', edgecolor='k')
+ax_x1.set_title('Marginal para a')
+ax_x1.set_ylabel('frecuencia')
+ax_x1.tick_params(labelbottom=False)
 
-# Histograma marginal de theta
-axes[1, 0].hist(theta_samples, bins=100, color='salmon', edgecolor='k')
-axes[1, 0].set_title("Histograma marginal de θ")
-axes[1, 0].set_xlabel("θ (grados)")
+pos = ax_x1.get_position()
+ax_x1.set_position([pos.x0, pos.y0 + 0.03, pos.width, pos.height])
+ax_x1.set_xlim(xedges[0], xedges[-1])
+ax_x1.set_xlim(ax_join.get_xlim())
 
-# Ocultar el subplot inferior derecho
-axes[1, 1].axis('off')
+# Marginal para theta
+ax_x2 = fig.add_subplot(gs[1, 1], sharey=ax_join)
+x2_hist, x2_bins, _ = ax_x2.hist(theta_samples, bins=100, density=True, alpha=0.6, color='green', orientation='horizontal', label=r'Histograma de $\theta$', edgecolor='k')
+ax_x2.set_title(r'Marginal para $\theta$')
+ax_x2.set_xlabel('frecuencia')
+ax_x2.tick_params(labelleft=False)
 
-plt.tight_layout()
+fig.suptitle(r"Distribución uniforme de N dimensiones: Histograma conjunto y marginales con Ns $={1.0e+05}$", fontsize=14, y=0.965)
+plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
+
