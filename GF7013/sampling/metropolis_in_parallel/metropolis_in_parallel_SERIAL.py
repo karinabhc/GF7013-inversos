@@ -9,8 +9,7 @@ GF7013 - Metodos Inversos Avanzados
 Departamento de Geofisica - FCFM - Universidad de Chile 
 
 """
-COMPLETAR = None
-import numpy as NP
+import numpy as np
 from ...model_parameters import ensemble
 from ..metropolis import metropolis
 
@@ -43,11 +42,40 @@ def metropolis_in_parallel_SERIAL(m0, likelihood_fun, pdf_prior, proposal, num_M
           in the initial ensemble of models (use beta=1 if not performing TMCMC).
                           
     """
-
+    Nmodels = m0.Nmodels
+    Npar = m0.Npar
     
-    m = COMPLETAR # this is the final ensemble after Metropolis in Parallel.
-
-    acceptance_ratios = COMPLETAR # a 1D numpy array with the acceptance ratio of each
+    m = ensemble(Npar=Npar, Nmodels=Nmodels,
+                 use_log_likelihood=use_log_likelihood,
+                 beta=m0.beta
+                ) # this is the final ensemble after Metropolis in Parallel.
+    acceptance_ratios = np.zeros(Nmodels) # a 1D numpy array with the acceptance ratio of each
                                   # MCMC chain.
-    return m, acceptance_ratios
+    # performs the iterations with NburnIn = num_MCMC_steps - 1 
+    # (each chain obtains only 1 sample)
+    for i in range(Nmodels):
+      result_i = metropolis(m0=m0.m_set[i, :],
+                            likelihood_fun=likelihood_fun,
+                            pdf_prior=pdf_prior,
+                            proposal=proposal,
+                            num_samples=1,
+                            num_burnin=num_MCMC_steps -1,
+                            use_log_likelihood=use_log_likelihood,
+                            save_samples=False,
+                            beta=m0.beta,
+                            LogOfZero=None,
+                            rng=None,
+                            seed=None
+                           )
+      # Guardar el modelo final aceptado
+      m.m_set[i, :] = result_i['m']
+      m.fprior[i]   = result_i['fprior']
+      m.like[i]     = result_i['like']
+      m.f[i]        = result_i['fpost']
 
+      # Guardar razón de aceptación de la cadena i
+      acceptance_ratios[i] = result_i['acceptance_ratio']
+    
+
+    return m, acceptance_ratios
+  
