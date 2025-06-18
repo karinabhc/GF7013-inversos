@@ -7,8 +7,10 @@ GF7013_path = os.path.abspath(os.path.join(this_module_folder, '../../../..'))
 sys.path.append(GF7013_path)
 
 from GF7013.model_parameters import ensemble
-from GF7013.sampling.metropolis import metropolis, proposal
-from GF7013.sampling import probability_distributions as pdfs
+from GF7013.sampling.metropolis import metropolis
+from GF7013.sampling.metropolis.proposal_normal import proposal_normal
+
+from GF7013.probability_functions import pdf as pdfs
 
 import numpy as NP
 import matplotlib.pyplot as plt
@@ -65,9 +67,8 @@ if __name__ == '__main__':
     
     # define proposal distribution
     sigma_prop = (x_max_ini - x_min_ini)/100
-    proposal_params = {}
-    proposal_params['cov'] = NP.array([[sigma_prop]]) # 2D array!!
-    proposal_pdf = proposal.proposal_normal(par=proposal_params)
+    cov = NP.array([[sigma_prop]]) # 2D array!!
+    proposal_pdf = proposal_normal(cov=cov)
 
     # define initial model:
     m0 = NP.array([-10]) # 1D array!!!
@@ -103,9 +104,18 @@ if __name__ == '__main__':
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, 
             color = 'red')
+    ax1.set_xlabel("Valor del Parámetro (m)")
+    ax1.set_ylabel("Densidad de Probabilidad")
+    ax1.legend()
+    ax1.set_title("Distribución Muestreada vs. PDF Teórica")
+
     ax2 = fig.add_subplot(212, sharex=ax1)
     ax2.plot(results['samples'].m_set.flatten(), range(NumSamples), '.-r')
-
+    ax2.set_xlabel("Modelos Muestreados (m)")
+    ax2.set_ylabel("Número de Muestras")
+    ax2.set_title(" Muestras de Modelos vs. Número de Muestras")
+        
     plt.show()
+
 
     
