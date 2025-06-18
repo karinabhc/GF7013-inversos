@@ -17,6 +17,7 @@ self.draw(): produces a numpy array with realizations of the distribution.
 """
 from .pdf_base import pdf_base
 import numpy as np
+import numpy as NP
 
 class pdf_uniform_nD(pdf_base):
     """
@@ -68,6 +69,51 @@ class pdf_uniform_nD(pdf_base):
         self.log_normalization = self.LogZero + np.log(self.normalization)
     
     ####
+    def __internal_checks(self, tol_zero = 1000):
+        """
+        determine the number of dimensions of the random variable based in the limits
+        also check limits consistency.
+        """
+        if 'lower_lim' in self.par.keys():
+            llshape = self.par['lower_lim'].shape
+            if len(llshape) != 1:
+                raise ValueError("'lower_lim' must be a 1D numpy array")
+            else:
+               NumLL = len(self.par['lower_lim'])
+        else:
+            raise ValueError("'lower_lim' must be a key of par dictionary.")
+
+        if 'upper_lim' in self.par.keys():
+            ulshape = self.par['upper_lim'].shape
+            if len(ulshape) != 1:
+                raise ValueError("'upper_lim' must be a 1D numpy array")
+            else:
+               NumUL = len(self.par['upper_lim'])
+        else:
+            raise ValueError("'upper_lim' must be a key of par dictionary.")
+   
+        if NumUL == NumLL:
+            self.N = NumUL
+        else:
+            raise ValueError("The size of 'upper_lim' and 'lower_lim' must be the same.") 
+               
+        # check that intervals are finite
+        dif = NP.abs(self.par['lower_lim'] - self.par['upper_lim'])
+        if NP.min(dif) < NP.finfo(float).eps * tol_zero :
+           raise ValueError('at least one interval of the boundaries is not finite.')
+        # check right order of limits
+        if ( self.par['lower_lim'] > self.par['upper_lim'] ).any():
+            raise ValueError('At least one lower_limit is larger than one upper_limit.')
+       
+        # compute normalization constant.
+        self.normalization = 1 / NP.prod(dif) # is the size of the uniform volume.
+        if self.normalization < 1E3 * NP.finfo(float).eps:
+           print('Floating point overflow when calculating the '
+                        +'normalization constant.')
+           print('Use Likelihood values instead of pdf.')
+           self.normalization = None
+
+    ##############       
     def __check_x(self, x):
         """
         Check that the array x has the correct shape and size
@@ -88,7 +134,7 @@ class pdf_uniform_nD(pdf_base):
         x must be a numpy array of 1 D.
         """
         x = self.__check_x(x)
-        if x >= self.ll and x <= self.ul:
+        if (x >= self.ll).all() and (x <= self.ul).all():
             return 0.0
         else:
             return self.LogZero
@@ -102,7 +148,7 @@ class pdf_uniform_nD(pdf_base):
         """
         x = self.__check_x(x)
  
-        if x >= self.ll and x <= self.ul:
+        if (x >= self.ll).all() and (x <= self.ul).all():
             return 1.0
         else:
             return 0.0

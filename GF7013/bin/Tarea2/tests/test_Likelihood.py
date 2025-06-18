@@ -8,21 +8,49 @@ root_dir = os.path.abspath(os.path.join(current_dir, "..", "..", ".."))
 sys.path.append(root_dir)
 
 from GF7013.probability_functions.pdf.pdf_normal import pdf_normal
+from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
 from GF7013.model_parameters.ensemble import ensemble
 from GF7013.models.ajuste_ortogonal_recta.forward import forward
+from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
+
 
 # (I) SIMULAR DATOS
 np.random.seed(0)
+
+# N = 25
+# semi_eje_mayor = 8
+# semi_eje_menor = 2
+# alpha = 45
+# delta_x = 0
+# delta_y = 4
+# desviacion_estandar_x = 1.0
+# desviacion_estandar_y = 1.0
+
 N = 100
-x_obs = np.random.uniform(-10, 10, size=N)
-y_obs = np.random.uniform(-10, 10, size=N)
-sigma_x = np.ones(N)
-sigma_y = np.ones(N)
+semi_eje_mayor = 20
+semi_eje_menor = 2
+alpha = 45
+delta_x = 0
+delta_y = 0
+desviacion_estandar_x = 1.0
+desviacion_estandar_y = 1.0
+
+x_obs, y_obs, sigma_x, sigma_y = obtener_datos_elipses(
+                                        N = N,
+                                        a = semi_eje_mayor,
+                                        b = semi_eje_menor,
+                                        alpha = alpha,
+                                        deltax = delta_x,
+                                        deltay = delta_y,
+                                        sigma_x = desviacion_estandar_x,
+                                        sigma_y = desviacion_estandar_y)
+
+
 
 modelo_directo = forward(x_obs, y_obs, sigma_x, sigma_y)
 
-# RANGO DE MODELOS
+# MODELOS
 normas = np.sqrt(x_obs**2 + y_obs**2)
 max_norma = np.max(normas)
 a_min, a_max = -2 * max_norma, 2 * max_norma
@@ -34,7 +62,9 @@ theta_vals = np.linspace(theta_min, theta_max, Ntheta)
 m = np.array([[a, theta] for a in a_vals for theta in theta_vals])
 Nm = m.shape[0]
 
-# (II y III) Ensemble con verosimilitudes normales
+##################################################################################
+#ENSEMBLE
+# (II y III) Ensemble con verosimilitudes NORMALES JEJE
 ensemble_normal = ensemble(Npar=2, Nmodels=Nm, use_log_likelihood=False)
 ensemble_log = ensemble(Npar=2, Nmodels=Nm, use_log_likelihood=True)
 
@@ -48,25 +78,44 @@ cov = np.diag(sigma_deltas**2)  # matriz de covarianza diagonal
 params = {'mu': np.zeros(N), 'cov': cov}
 pdf_datos = pdf_normal(par=params)
 
+##################################################################################
+#VEROSIMILITUD
 # Instancia de la función de verosimilitud
 L = likelihood_function(modelo_directo, pdf_datos)
 
 # Evaluar verosimilitudes y log-verosimilitudes
 ensemble_normal.like[:] = np.array([L.likelihood(mi) for mi in m])
-ensemble_normal.f[:] = ensemble_normal.like[:]  # Suponiendo f ≡ like
 ensemble_log.like[:] = np.array([L.log_likelihood(mi) for mi in m])
-ensemble_log.f[:] = ensemble_log.like[:]        # Suponiendo f ≡ log_like
 
-# (IV) Graficar resultados
-A, T = np.meshgrid(theta_vals, a_vals)
+##################################################################################
+#FPRIOR
+lower_lim = np.array([a_min, theta_min])
+upper_lim = np.array([a_max, theta_max])
 
+par_fprior = {
+    'lower_lim': lower_lim,
+    'upper_lim': upper_lim
+}
+
+pdf_fprior = pdf_uniform_nD(par_fprior)
+
+ensemble_normal.fprior[:] = np.array([pdf_fprior._likelihood(m) for m in ensemble_normal.m_set])
+ensemble_log.fprior[:] = np.array([pdf_fprior._log_likelihood(m) for m in ensemble_normal.m_set])
+##################################################################################
+#FPOST
+ensemble_normal.f[:] = ensemble_normal.fprior[:]*ensemble_normal.like[:]
+ensemble_log.f[:] = ensemble_log.fprior[:]*ensemble_log.like[:]   
+
+##################################################################################
+# (IV) RESULTADOS
+T, A = np.meshgrid(theta_vals, a_vals)
 
 fig, axes = plt.subplots(2, 3, figsize=(18, 10))  # 2 filas, 3 columnas
 
 def plot_grid(ax, Z, title, cmap="viridis"):
     im = ax.pcolor(T, A, Z.reshape(Na, Ntheta), shading='auto', cmap=cmap)
     ax.set_title(title)
-    ax.set_xlabel('θ [°]')
+    ax.set_xlabel(r'$\theta$ [°]')
     ax.set_ylabel('a')
     plt.colorbar(im, ax=ax)
 

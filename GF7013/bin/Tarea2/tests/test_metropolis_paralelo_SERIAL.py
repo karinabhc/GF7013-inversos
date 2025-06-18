@@ -14,7 +14,6 @@ from GF7013.probability_functions import pdf as pdfs
 
 import numpy as NP
 import matplotlib.pyplot as plt
-
 # define the pdf to sample (must have the likelihood/log_likelood function defined)
 # THIS WILL BE USED AS THE LIKELHOOD FUNCTION!!!
 class pdf_bimodal(object):
@@ -75,7 +74,7 @@ if __name__ == '__main__':
 
     # define initial models as samples from U(x_min, x_max)
     NumSamples = int(1E5)
-    NumBurnIn = int(0.3 * NumSamples) #profe dijo 30% que estaba bien 
+    NumBurnIn = int(0.1 * NumSamples)
     use_log_likelihood = False
     #############
     # YOU CAN TRY DIFFERENT VALUES OF BETA and see what happens!
@@ -104,20 +103,9 @@ if __name__ == '__main__':
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, 
             color = 'red')
-    
-    ax1.set_xlabel("Valor del Parámetro (m)")
-    ax1.set_ylabel("Densidad de Probabilidad")
-    ax1.legend()
-    ax1.set_title("Distribución Muestreada vs. PDF Teórica")
-
     ax2 = fig.add_subplot(212, sharex=ax1)
-    sc= ax2.scatter(results['samples'].m_set.flatten(), range(NumSamples),c=NP.arange(NumSamples),cmap='rainbow',s=1)
-    plt.colorbar(sc, ax=ax2, label='Índice de Muestra')
-    ax2.set_xlabel("Modelos Muestreados (m)")
-    ax2.set_ylabel("Número de Muestras")
-    ax2.set_title(" Muestras de Modelos vs. Número de Muestras")
-        
-    plt.show()
+    ax2.plot(results['samples'].m_set.flatten(), range(NumSamples), '.-r')
 
+    plt.show()
 
     
