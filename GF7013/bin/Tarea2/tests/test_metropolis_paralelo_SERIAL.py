@@ -73,15 +73,15 @@ if __name__ == '__main__':
                   use_log_likelihood=use_log_likelihood,
                   beta=beta)
     
-    results = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
+    m, acceptance_ratios = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,
                                             num_MCMC_steps=numStepChains,
                                             use_log_likelihood=use_log_likelihood
                                             )
 
-    print(results['samples'].m_set.flatten())
-    print(results['samples'].f)
+    print(m.m_set.flatten())
+    print(m.f)
 
     f_values_beta = NP.array([f.likelihood(aux)**beta for aux in x_eval])
     dx = x_eval[1] - x_eval[0]
@@ -91,10 +91,10 @@ if __name__ == '__main__':
     ax1 = fig.add_subplot(211)
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
-    ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, 
+    ax1.hist(m.m_set.flatten(), density = True, bins = 300, 
             color = 'red')
     ax2 = fig.add_subplot(212, sharex=ax1)
-    ax2.plot(results['samples'].m_set.flatten(), range(NumSamples), '.-r')
+    ax2.plot(m.m_set.flatten(), range(NumSamples), '.-r')
 
     plt.show()
 
