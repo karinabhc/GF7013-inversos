@@ -103,10 +103,10 @@ if __name__ == '__main__':
     ax1 = fig.add_subplot(211)
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
-    ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, 
-            color = 'red')
-    
-    ax1.set_xlabel("Valor del Parámetro (m)")
+#    sc1= ax1.scatter(results['samples'].m_set.flatten(), NP.arange(NumSamples), c=NP.arange(NumSamples),cmap='rainbow', s=1)
+    ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, color='orange', alpha=0.5)
+#    plt.colorbar(sc1, ax=ax1, label='Índice de Muestra')
+    ax1.set_xlabel("modelos muestreados (m)")
     ax1.set_ylabel("Densidad de Probabilidad")
     ax1.legend()
     ax1.set_title("Distribución Muestreada vs. PDF Teórica")
@@ -120,6 +120,7 @@ if __name__ == '__main__':
     ax2.set_title(" Muestras de Modelos vs. Número de Muestras")
         
     plt.show()
+
 
 
     

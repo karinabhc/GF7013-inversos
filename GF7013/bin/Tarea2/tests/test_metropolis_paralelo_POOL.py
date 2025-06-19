@@ -102,5 +102,3 @@ if __name__ == '__main__':
     ax2.plot(m.m_set.flatten(), range(NumSamples), '.-r')
 
     plt.show()
-
-    

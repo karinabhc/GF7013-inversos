@@ -69,6 +69,7 @@ def metropolis_in_parallel_POOL(m0, likelihood_fun,
     num_cores = cpu_count(logical=False)
 
     Nm, Npar = m0.Nmodels, m0.Npar 
+    
 
     arg_metropolis = [
         (m0.m_set[i, :], likelihood_fun, pdf_prior,proposal, 1,
@@ -80,15 +81,17 @@ def metropolis_in_parallel_POOL(m0, likelihood_fun,
     
 
     m = ensemble(Npar=Npar, Nmodels=Nm, use_log_likelihood=True,beta=1.0) # this is the final ensemble after Metropolis in Parallel.
-    m.m_set = NP.array([result['m'] for result in results]) # set the models from the results
-    m.fprior = NP.array([result['fprior'][0] for result in results]) # set the prior log likelihoods
-    m.like = NP.array([result['like'][0] for result in results]) # set the likelihoods
-    m.f = NP.array([result['fpost'][0] for result in results]) # set the posterior log likelihoods
-
-
     acceptance_ratios = NP.zeros(Nm) # a 1D numpy array with the acceptance ratio of each
                                   # MCMC chain.
-    for i, result in enumerate(results):
-        acceptance_ratios[i] = result['acceptance_ratio']
+   
+    for i, result_i in enumerate(results):
+        m.m_set[i, :] = result_i['m']
+        m.fprior[i] = result_i['fprior']
+        m.like[i] = result_i['like']
+        m.f[i] = result_i['fpost']
+
+        acceptance_ratios[i] = result_i['acceptance_ratio']
 
     return m, acceptance_ratios
+
+
