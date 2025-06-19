@@ -68,9 +68,9 @@ n_obs = len(x_obs)
 
 
 # Parámetros teóricos
-mu = np.array([-1.0, 4.0])
-cov = np.array([[2.0, 1.0], [1.0, 4.0]])
-par = {'mu': mu, 'cov': cov}
+#mu = np.array([-1.0, 4.0])
+#cov = np.array([[2.0, 1.0], [1.0, 4.0]])
+par = {'mu': np.zeros(n_obs), 'cov': np.eye(n_obs)}
 pdf = pdf_normal(par)
 
 # Crear la función de verosimilitud usando tu clase del paquete
