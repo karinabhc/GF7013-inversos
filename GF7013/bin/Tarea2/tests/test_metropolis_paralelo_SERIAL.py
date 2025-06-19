@@ -11,6 +11,7 @@ from GF7013.sampling.metropolis_in_parallel import metropolis_in_parallel_SERIAL
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 
 from GF7013.probability_functions import pdf as pdfs
+from GF7013.probability_functions.likelihood import likelihood_function
 
 import numpy as NP
 import matplotlib.pyplot as plt
@@ -63,17 +64,16 @@ if __name__ == '__main__':
 
 
     # define initial model:
-    # m0 = NP.array([-10]) # 1D array!!!
     Npar = 1
-    NumSamples = int(1E5)
-    # NumBurnIn = int(0.1 * NumSamples)
+    NumSamples = int(1E4)
     use_log_likelihood = False
     beta = 1
     numStepChains = 300
     m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta)
-    results = metropolis_in_parallel_SERIAL(m0,likelihood_fun=like_fun,
+    
+    results = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,
                                             num_MCMC_steps=numStepChains,
