@@ -94,5 +94,5 @@ if __name__ == '__main__':
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(m.m_set.flatten(), density = True, bins = 300, color = 'red')
-    
+    ax1.legend()
     plt.show()
