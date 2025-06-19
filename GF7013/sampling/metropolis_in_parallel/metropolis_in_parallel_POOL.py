@@ -11,13 +11,18 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 """
 COMPLETAR = None
 import numpy as NP
+import os
 from ...model_parameters import ensemble
 from ..metropolis import metropolis
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool
+from psutil import cpu_count
 
 
-def metropolis_in_parallel_POOL(m0, likelihood_fun, pdf_prior, proposal, num_MCMC_steps,  
-               use_log_likelihood = True):
+
+def metropolis_in_parallel_POOL(m0, likelihood_fun, 
+                                pdf_prior, proposal,
+                                num_MCMC_steps,  
+                                use_log_likelihood = True):
     """
     Performs the Metropolis in Parallel Algorithm. THIS IS A PARALLELIZED VERSION OF THE 
     ALGORITHM, THUS IT RUNS AS MANY MCMC CHAINS AT THE SAME TIME AS THE NUMBER OF 
@@ -61,11 +66,32 @@ def metropolis_in_parallel_POOL(m0, likelihood_fun, pdf_prior, proposal, num_MCM
          -BE careful with random number generation. Each parallel process must have a 
          different seed.                
     """
+    num_cores = cpu_count(logical=False)
 
+    Nm, Npar = m0.Nmodels, m0.Npar 
     
-    m = COMPLETAR # this is the final ensemble after Metropolis in Parallel.
 
-    acceptance_ratios = COMPLETAR # a 1D numpy array with the acceptance ratio of each
+    arg_metropolis = [
+        (m0.m_set[i, :], likelihood_fun, pdf_prior,proposal, 1,
+         num_MCMC_steps-1, use_log_likelihood) for i in range(Nm)]
+    
+    with Pool(processes=num_cores) as pool:
+        # Ejecutar metropolis en paralelo
+        results = pool.starmap(metropolis, arg_metropolis, chunksize=1)
+    
+
+    m = ensemble(Npar=Npar, Nmodels=Nm, use_log_likelihood=True,beta=1.0) # this is the final ensemble after Metropolis in Parallel.
+    acceptance_ratios = NP.zeros(Nm) # a 1D numpy array with the acceptance ratio of each
                                   # MCMC chain.
+   
+    for i, result_i in enumerate(results):
+        m.m_set[i, :] = result_i['m']
+        m.fprior[i] = result_i['fprior']
+        m.like[i] = result_i['like']
+        m.f[i] = result_i['fpost']
+
+        acceptance_ratios[i] = result_i['acceptance_ratio']
+
     return m, acceptance_ratios
+
 
