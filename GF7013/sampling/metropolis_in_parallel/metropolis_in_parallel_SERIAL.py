@@ -12,6 +12,7 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 import numpy as np
 from ...model_parameters import ensemble
 from ..metropolis import metropolis
+from tqdm import tqdm
 
 def metropolis_in_parallel_SERIAL(m0, likelihood_fun, pdf_prior, proposal, num_MCMC_steps,  
                use_log_likelihood = True):
@@ -53,7 +54,7 @@ def metropolis_in_parallel_SERIAL(m0, likelihood_fun, pdf_prior, proposal, num_M
                                   # MCMC chain.
     # performs the iterations with NburnIn = num_MCMC_steps - 1 
     # (each chain obtains only 1 sample)
-    for i in range(Nmodels):
+    for i in tqdm(range(Nmodels)):
       result_i = metropolis(m0=m0.m_set[i, :],
                             likelihood_fun=likelihood_fun,
                             pdf_prior=pdf_prior,

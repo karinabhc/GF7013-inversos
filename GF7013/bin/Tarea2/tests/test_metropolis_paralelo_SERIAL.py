@@ -65,14 +65,13 @@ if __name__ == '__main__':
 
     # define initial model:
     Npar = 1
-    NumSamples = int(1E4)
+    NumSamples = int(1E5)
     use_log_likelihood = True
     beta = 1
-    numStepChains = 500
+    numStepChains = 300
     m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta)
-    
     m, acceptance_ratios = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,
@@ -94,5 +93,10 @@ if __name__ == '__main__':
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(m.m_set.flatten(), density = True, bins = 300, color = 'red')
+    ax1.hist(m0.m_set.flatten(), density = True, bins = 300, color = 'lightgray', alpha=0.5)
     
+    ax1.set_xlabel("modelos muestreados (m)")
+    ax1.set_ylabel("Densidad de Probabilidad")
+    ax1.legend()
+    ax1.set_title("Distribución Muestreada vs. PDF Teórica")
     plt.show()
