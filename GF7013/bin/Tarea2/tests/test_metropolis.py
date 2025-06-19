@@ -71,7 +71,8 @@ if __name__ == '__main__':
     proposal_pdf = proposal_normal(cov=cov)
 
     # define initial model:
-    m0 = NP.array([-10]) # 1D array!!!
+    #m0 = NP.array([-10]) # 1D array!!!
+    m0 = fprior.draw()
 
     # define initial models as samples from U(x_min, x_max)
     NumSamples = int(1E5)
@@ -104,7 +105,7 @@ if __name__ == '__main__':
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
 #    sc1= ax1.scatter(results['samples'].m_set.flatten(), NP.arange(NumSamples), c=NP.arange(NumSamples),cmap='rainbow', s=1)
-    ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, color='orange', alpha=0.5)
+    ax1.hist(results['samples'].m_set.flatten(), density = True, bins = 300, color='tab:red', alpha=0.5)
 #    plt.colorbar(sc1, ax=ax1, label='Índice de Muestra')
     ax1.set_xlabel("modelos muestreados (m)")
     ax1.set_ylabel("Densidad de Probabilidad")
