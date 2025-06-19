@@ -97,7 +97,8 @@ if __name__ == '__main__':
     f_values_beta = NP.array([f.likelihood(aux)**beta for aux in x_eval])
     dx = x_eval[1] - x_eval[0]
     f_area_beta = NP.sum(f_values_beta)*dx # rectangle integration
-    fig = plt.figure(1)
+    
+    fig = plt.figure(1, layout='constrained')
     fig.set_size_inches((8,10))
     ax1 = fig.add_subplot(211)
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
@@ -111,7 +112,8 @@ if __name__ == '__main__':
     ax1.set_title("Distribución Muestreada vs. PDF Teórica")
 
     ax2 = fig.add_subplot(212, sharex=ax1)
-    sc= ax2.scatter(results['samples'].m_set.flatten(), range(NumSamples),c=NP.arange(NumSamples),cmap='rainbow',s=1)
+    sc = ax2.scatter(results['samples'].m_set.flatten(), range(NumSamples),
+                     c=NP.arange(NumSamples),cmap='rainbow',s=1)
     plt.colorbar(sc, ax=ax2, label='Índice de Muestra')
     ax2.set_xlabel("Modelos Muestreados (m)")
     ax2.set_ylabel("Número de Muestras")
