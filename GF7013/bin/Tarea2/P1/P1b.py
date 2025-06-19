@@ -18,12 +18,12 @@ from GF7013.models.ajuste_ortogonal_recta import recta
 
 # generar datos sinteticos
 
-N = 25
-semi_eje_mayor = 8
+N = 50
+semi_eje_mayor = 20
 semi_eje_menor = 2
 alpha = 45
 delta_x = 0
-delta_y = 4
+delta_y = 0
 desviacion_estandar_x = 1.0
 desviacion_estandar_y = 1.0
 
@@ -36,6 +36,7 @@ x_obs, y_obs, sigma_x, sigma_y = obtener_datos_elipses(
                                         deltay = delta_y,
                                         sigma_x = desviacion_estandar_x,
                                         sigma_y = desviacion_estandar_y)
+
 
 
 # ejemplo de como graficar una linea recta ()

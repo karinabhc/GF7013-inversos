@@ -27,7 +27,7 @@ np.random.seed(0)
 # desviacion_estandar_x = 1.0
 # desviacion_estandar_y = 1.0
 
-N = 100
+N = 50
 semi_eje_mayor = 20
 semi_eje_menor = 2
 alpha = 45
@@ -104,7 +104,7 @@ ensemble_log.fprior[:] = np.array([pdf_fprior._log_likelihood(m) for m in ensemb
 ##################################################################################
 #FPOST
 ensemble_normal.f[:] = ensemble_normal.fprior[:]*ensemble_normal.like[:]
-ensemble_log.f[:] = ensemble_log.fprior[:]*ensemble_log.like[:]   
+ensemble_log.f[:] = ensemble_log.fprior[:] + ensemble_log.like[:]   
 
 ##################################################################################
 # (IV) RESULTADOS
@@ -127,7 +127,7 @@ plot_grid(axes[0, 2], ensemble_normal.f, 'f = fprior * like (normal)', cmap='Gre
 # Fila 2: valores en log
 plot_grid(axes[1, 0], ensemble_log.fprior, 'log(fprior)', cmap='Blues')
 plot_grid(axes[1, 1], ensemble_log.like, 'log(like)', cmap='Reds')
-plot_grid(axes[1, 2], ensemble_log.f, 'log(f) = log(fprior * like)', cmap='Greens')
+plot_grid(axes[1, 2], ensemble_log.f, 'log(f) = log(fprior + like)', cmap='Greens')
 
 plt.tight_layout()
 plt.show()
