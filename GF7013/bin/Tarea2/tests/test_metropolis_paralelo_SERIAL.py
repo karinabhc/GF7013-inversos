@@ -94,8 +94,12 @@ if __name__ == '__main__':
     ax1.hist(m.m_set.flatten(), density = True, bins = 300, 
             color = 'red')
     ax2 = fig.add_subplot(212, sharex=ax1)
-    ax2.plot(m.m_set.flatten(), range(NumSamples), '.-r')
-
+    ax2.plot(m.m_set.flatten(), range(NumSamples),c=NP.arange(NumSamples),cmap='rainbow',s=1)
+    plt.colorbar(sc, ax=ax2, label='Índice de Muestra')
+    ax2.set_xlabel("Modelos Muestreados (m)")
+    ax2.set_ylabel("Número de Muestras")
+    ax2.set_title(" Muestras de Modelos vs. Número de Muestras")
+    
     plt.show()
 
     
