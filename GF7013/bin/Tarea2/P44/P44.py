@@ -94,7 +94,7 @@ proposal = proposal_normal(cov=cov_matrix)
 NumSamples = int(5e4)
 NumBurnIn = int(0.3 * NumSamples)
 #NumBurnIn = 0
-
+numStepChains=300
 use_log_likelihood = True
 
 #m0 = np.array([0.0, 0.0])  # Modelo inicial, valores iniciales para [a, theta]
@@ -106,18 +106,14 @@ m0 = ensemble(
 
 # generamos los modelos iniciales como muestras de fprior
 m0.m_set[:] = fprior.draw()
-print('m0:')
-print(m0.m_set)
 
-m, aceptance_ratios = metropolis_in_parallel_POOL(m0=m0, 
-                    likelihood_fun=likelihood_fun, 
-                    pdf_prior=fprior, 
-                    proposal=proposal, 
-                    num_samples=NumSamples,
-                    num_burnin=NumBurnIn,
-                    use_log_likelihood=use_log_likelihood,
-                    save_samples=True,
-                    beta=1)
+
+m,acceptance_ratios = metropolis_in_parallel_POOL(m0,likelihood_fun=likelihood_fun,
+                                            pdf_prior=fprior,
+                                            proposal=proposal,
+                                            num_MCMC_steps=numStepChains,
+                                            use_log_likelihood=use_log_likelihood
+                                            )
 
 # Extraer muestras
 samples = cadena['samples']
@@ -169,4 +165,5 @@ ax_theta.tick_params(labelleft=False)
 fig.suptitle("Distribución de Parámetros: Histograma Conjunto y Marginales", fontsize=14, y=0.965)
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
+
 
