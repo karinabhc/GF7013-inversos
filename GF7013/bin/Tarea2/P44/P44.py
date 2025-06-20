@@ -116,9 +116,10 @@ m,acceptance_ratios = metropolis_in_parallel_POOL(m0,likelihood_fun=likelihood_f
                                             )
 
 # Extraer muestras
-samples = cadena['samples']
-a_samples = samples.m_set[:, 0]
-theta_samples = samples.m_set[:, 1]
+samples = m.m_set
+print(samples)
+a_samples = samples[:, 0]
+theta_samples = samples[:, 1]
 
 # --- Graficar evolución de parámetros ---
 fig = plt.figure(figsize=(10, 6))
