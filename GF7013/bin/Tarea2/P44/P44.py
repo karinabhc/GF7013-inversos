@@ -116,8 +116,10 @@ if __name__ == '__main__':
                                                 )
 
     # Extraer muestras
-    a_samples = m.m_set[:, 0]
-    theta_samples = m.m_set[:, 1]
+    samples = m.m_set
+    print(samples)
+    a_samples = samples[:, 0]
+    theta_samples = samples[:, 1]
 
     # --- Graficar evolución de parámetros ---
     fig = plt.figure(figsize=(10, 6))
