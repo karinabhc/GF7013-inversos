@@ -12,6 +12,8 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 COMPLETAR = None
 import numpy as np
 from ...model_parameters import ensemble
+from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD  # Para la distribución a priori
+
 
 def metropolis(m0, likelihood_fun, pdf_prior, proposal, num_samples, num_burnin, 
                use_log_likelihood = True, save_samples = True, beta = 1,

@@ -15,6 +15,7 @@ from GF7013.probability_functions import pdf as pdfs
 import numpy as NP
 import matplotlib.pyplot as plt
 
+
 # define the pdf to sample (must have the likelihood/log_likelood function defined)
 # THIS WILL BE USED AS THE LIKELHOOD FUNCTION!!!
 class pdf_bimodal(object):
@@ -68,11 +69,12 @@ if __name__ == '__main__':
     # define proposal distribution
     sigma_prop = (x_max_ini - x_min_ini)/100
     cov = NP.array([[sigma_prop]]) # 2D array!!
+
     proposal_pdf = proposal_normal(cov=cov)
 
     # define initial model:
-    #m0 = NP.array([-10]) # 1D array!!!
-    m0 = fprior.draw()
+    m0 = NP.array([-10]) # 1D array!!!
+    #m0 = fprior.draw()
 
     # define initial models as samples from U(x_min, x_max)
     NumSamples = int(1E5)

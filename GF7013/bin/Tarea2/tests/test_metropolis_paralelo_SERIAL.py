@@ -87,17 +87,25 @@ if __name__ == '__main__':
     f_area_beta = NP.sum(f_values_beta)*dx # rectangle integration
     
     
-    fig = plt.figure(1)
+    fig = plt.figure(1, layout='constrained')
     fig.set_size_inches((8,10))
     ax1 = fig.add_subplot(111)
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(m.m_set.flatten(), density = True, bins = 300, color = 'red')
     ax1.legend()
-    ax1.hist(m0.m_set.flatten(), density = True, bins = 300, color = 'lightgray', alpha=0.5)
+    #ax1.hist(m0.m_set.flatten(), density = True, bins = 300, color = 'lightgray', alpha=0.5)
     
     ax1.set_xlabel("modelos muestreados (m)")
     ax1.set_ylabel("Densidad de Probabilidad")
     ax1.legend()
     ax1.set_title("Distribución Muestreada vs. PDF Teórica")
+
+    ax2 = fig.add_subplot(212, sharex=ax1)
+    sc = ax2.scatter(m.m_set.flatten(), range(NumSamples),
+                     c=NP.arange(NumSamples),cmap='rainbow',s=1)
+    plt.colorbar(sc, ax=ax2, label='Índice de Muestra')
+    ax2.set_xlabel("Modelos Muestreados (m)")
+    ax2.set_ylabel("Número de Muestras")
+    ax2.set_title(" Muestras de Modelos vs. Número de Muestras")
     plt.show()

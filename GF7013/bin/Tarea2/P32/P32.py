@@ -79,17 +79,23 @@ likelihood_fun = likelihood_function(forward=modelo_forward, pdf_data=pdf)
 
 # Definir la distribución de propuesta (normal multivariada)
 # Matriz de covarianza para la propuesta
-sigma_a = 0.5  # desviación estándar para el parámetro 'a'
-sigma_theta = 0.5  # desviación estándar para el parámetro 'theta'
-cov_matrix = np.array([[sigma_a**2, 0], 
-                       [0, sigma_theta**2]])
+#sigma_a = 0.5  # desviación estándar para el parámetro 'a'
+#sigma_theta = 0.5  # desviación estándar para el parámetro 'theta'
+#cov_matrix = np.array([[sigma_a**2, 0],0000 
+#                       [0, sigma_theta**2]])
+
+alpha=1/100
+delta = (fprior.par['upper_lim'] - fprior.par['lower_lim']) 
+cov_matrix = np.diag((alpha*delta))  # 2D array!!
+#deltas =fprior.par['upper_lim'] - fprior.par['lower_lim']
+#cov_matrix = np.diag(alpha * deltas**2)  # Matriz de cov
 
 proposal = proposal_normal(cov=cov_matrix)
 
 
 # Parámetros del Metropolis
-NumSamples = int(5e4)
-NumBurnIn = int(0.3 * NumSamples)
+NumSamples = int(1e5)
+NumBurnIn = int(0.1 * NumSamples)
 use_log_likelihood = True
 
 #m0 = np.array([0.0, 0.0])  # Modelo inicial, valores iniciales para [a, theta]
@@ -115,16 +121,16 @@ theta_samples = samples.m_set[:, 1]
 
 # --- Graficar evolución de parámetros ---
 fig, axs = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
-axs[0].plot(a_samples, alpha=0.7)
+axs[0].scatter(np.arange(len(a_samples)), a_samples, alpha=0.7)
 axs[0].set_ylabel('a')
 axs[0].grid(True)
 axs[0].set_title('Evolución del parámetro a')
 
-axs[1].plot(theta_samples, alpha=0.7, color='orange')
+axs[1].scatter(np.arange(len(a_samples)),theta_samples, alpha=0.7, color='orange')
 axs[1].set_ylabel('theta [grados]')
 axs[1].set_xlabel('Iteración')
 axs[1].grid(True)
-axs[1].y_
+
 axs[1].set_title('Evolución del parámetro theta')
 
 plt.suptitle("Evolución de la cadena de Metropolis")
