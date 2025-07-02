@@ -91,12 +91,11 @@ if __name__ == '__main__':
     
     fig = plt.figure(1, layout='constrained')
     fig.set_size_inches((8,10))
-    ax1 = fig.add_subplot(111)
+    ax1 = fig.add_subplot(211)
     ax1.plot(x_eval, f_values/f_area, label = 'Bimodal PDF', color = 'cyan')
     ax1.plot(x_eval, f_values_beta/f_area_beta, '--k', label = 'Bimodal PDF')
     ax1.hist(m.m_set.flatten(), density = True, bins = 300, color = 'red')
     ax1.legend()
-    #ax1.hist(m0.m_set.flatten(), density = True, bins = 300, color = 'lightgray', alpha=0.5)
     
     ax1.set_xlabel("modelos muestreados (m)")
     ax1.set_ylabel("Densidad de Probabilidad")

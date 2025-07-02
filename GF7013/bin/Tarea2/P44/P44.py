@@ -1,3 +1,6 @@
+"""
+Script similar a P32, pero con modelos iniciales generados como muestras de fprior
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -16,8 +19,10 @@ from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD  # Pa
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
 from GF7013.probability_functions.pdf.pdf_normal import pdf_normal  # Para la distribución de los residuos
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
-from GF7013.sampling.metropolis.metropolis import metropolis, _fpost,_log_fpost
+from GF7013.sampling.metropolis_in_parallel import metropolis_in_parallel_POOL, metropolis_in_parallel_SERIAL
 import matplotlib.gridspec as gridspec
+
+from GF7013.model_parameters import ensemble
 
 
 N = 50
@@ -89,28 +94,32 @@ proposal = proposal_normal(cov=cov_matrix)
 NumSamples = int(5e4)
 NumBurnIn = int(0.3 * NumSamples)
 #NumBurnIn = 0
-
+numStepChains=300
 use_log_likelihood = True
 
 #m0 = np.array([0.0, 0.0])  # Modelo inicial, valores iniciales para [a, theta]
-m0 = fprior.draw()
-print('m0:')
-print(m0)
+m0 = ensemble(
+              Npar = 2, Nmodels=NumSamples, 
+              use_log_likelihood=use_log_likelihood,
+              beta=1
+            ) # fprior.draw()
 
-cadena = metropolis(m0=m0, 
-                    likelihood_fun=likelihood_fun, 
-                    pdf_prior=fprior, 
-                    proposal=proposal, 
-                    num_samples=NumSamples,
-                    num_burnin=NumBurnIn,
-                    use_log_likelihood=use_log_likelihood,
-                    save_samples=True,
-                    beta=1)
+# generamos los modelos iniciales como muestras de fprior
+m0.m_set[:] = fprior.draw()
+
+
+m,acceptance_ratios = metropolis_in_parallel_POOL(m0,likelihood_fun=likelihood_fun,
+                                            pdf_prior=fprior,
+                                            proposal=proposal,
+                                            num_MCMC_steps=numStepChains,
+                                            use_log_likelihood=use_log_likelihood
+                                            )
 
 # Extraer muestras
-samples = cadena['samples']
-a_samples = samples.m_set[:, 0]
-theta_samples = samples.m_set[:, 1]
+samples = m.m_set
+print(samples)
+a_samples = samples[:, 0]
+theta_samples = samples[:, 1]
 
 # --- Graficar evolución de parámetros ---
 fig = plt.figure(figsize=(10, 6))
@@ -157,4 +166,6 @@ ax_theta.tick_params(labelleft=False)
 fig.suptitle("Distribución de Parámetros: Histograma Conjunto y Marginales", fontsize=14, y=0.965)
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.show()
+
+
 
