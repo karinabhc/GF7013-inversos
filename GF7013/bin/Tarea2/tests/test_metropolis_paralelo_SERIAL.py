@@ -69,9 +69,11 @@ if __name__ == '__main__':
     use_log_likelihood = True
     beta = 1
     numStepChains = 300
-    m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
-                  use_log_likelihood=use_log_likelihood,
-                  beta=beta)
+    m0 = NP.array([-10]) # 1D array!!!
+
+    #m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
+    #              use_log_likelihood=use_log_likelihood,
+    #              beta=beta)
     m, acceptance_ratios = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,

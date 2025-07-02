@@ -60,7 +60,7 @@ def metropolis_in_parallel_SERIAL(m0, likelihood_fun, pdf_prior, proposal, num_M
                             pdf_prior=pdf_prior,
                             proposal=proposal,
                             num_samples=1,
-                            num_burnin=num_MCMC_steps -1,
+                            num_burnin=num_MCMC_steps,
                             use_log_likelihood=use_log_likelihood,
                             save_samples=False,
                             beta=m0.beta,
