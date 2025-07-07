@@ -1,0 +1,81 @@
+"""
+Transitional Markov Chain Monte Carlo (TMCMC)
+based on the Metropolis in Parallel Algorithm (multiprocessing.Pool version)
+
+Generates samples from a posterior pdf using the TMCMC algorithm based on 
+the Metropolis in Parallel algorithm (parallel version using multiprocessing.Pool)
+
+IMPORTANT: see tmcmc_metropolis_pool docstring for setting the environment 
+           variables that control the number of threads used by each parallel process.
+
+Francisco Ortega Culaciati
+ortega.francisco@uchile.cl
+Departamento de Geofisica - FCFM - Universidad de Chile 
+
+
+"""
+import numpy as NP
+from copy import deepcopy
+from ..metropolis_in_parallel import metropolis_in_parallel_POOL
+from .calc_dbeta import calc_dbeta
+from .resampling import resampling
+
+def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal, 
+                                num_MCMC_steps, num_proc = None, chunksize = 1,
+                                use_resampling = False):
+    """
+    Performs the Transitional Markov Chain Monte Carlo Algortihm (based on Metropolis).
+    THIS IS A PARALLELIZED VERSION OF THE ALGORITHM, THUS IT RUNS AS MANY MCMC CHAINS AT 
+    THE SAME TIME AS THE NUMBER OF COMPUTING PROCESSORS THAT ARE AVAILABLE. 
+    THIS CODE USES multiprocessing.Pool
+    https://docs.python.org/3/library/multiprocessing.html
+
+    REMEMBER TO SET THIS ENVIRONMENT VARIABLES IN THE MAIN SCRIPT OF THE CODE BEFORE
+    IMPORTING ANY OTHER PACKAGE
+    # set the number of threads for numpy
+      import os
+      os.environ["OMP_NUM_THREADS"] = "1"
+      os.environ["MKL_NUM_THREADS"] = "1"
+      os.environ["MKL_DOMAIN_NUM_THREADS"] = "1"
+      os.environ["OPENBLAS_NUM_THREADS"] = "1"
+      os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+      os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
+    - m0_ensemble : initial ensemble of models for the MCMC chains.
+    - likelihood_fun: an object that provides the functions likelihood_fun.likelihood(m)
+                      and likelihood_fun.log_likelihood(m) that return the value or 
+                      natural logarithm of the value of the likelihood function used
+                      for the inverse problem.
+    - pdf_prior: an object that provides the functions fprior.likelihood(m) and 
+                      fprior.log_likelihood(m) that return the value or 
+                      natural logarithm of the value of the prior probability
+                      function on model parameters used for the inverse problem.
+    - proposal: an object that provides the function proposal.propose(m) that returns
+               a model m_test, proposed as the next step of the MCMC chain.
+    - num_MCMC_steps: Number of MCMC steps of each Metropolis algorithm produced in 
+                      parallel.
+    - num_proc: Number of cores to use within multiprocessing.Pool. If None, it will 
+                use multiprocessing.cpu_count() to determine the number of cores.
+    - chunksize: number of tasks given at the same time to each parallel process. See
+                 multiprocessing.Pool documentation for further details.
+    - use_resampling: if True, performs resampling of the current samples after
+                      updating the beta value.
+                         
+    NOTE: the exponent beta of the likelihood function for TMCMC algorithm and if
+          the algorithm uses likelihood or log_likelihood values are defined in the
+          initial ensemble of models in the variables beta and use_log_likelihood
+          The algorithm will start to iterate using beta given in m0_ensemble.
+    """
+    
+    m_ensemble = deepcopy(m0_ensemble)
+    # initialize values of fprior, like and f in the initial models ensemble
+    COMPLETAR = COMPLETAR
+    
+    # do the iterations (initial beta value must be defined in the ensemble)
+    beta = m_ensemble.beta
+
+    while beta < 1:
+
+        COMPLETAR = COMPLETAR
+        
+    return m_ensemble, acceptance_ratios
