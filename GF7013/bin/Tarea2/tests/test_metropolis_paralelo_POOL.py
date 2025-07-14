@@ -1,5 +1,13 @@
 #! /usr/bin/env python
 import sys, os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["MKL_DOMAIN_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
+
 # get folder of this module
 this_module_folder = os.path.dirname(os.path.abspath(__file__))
 # add GF7013 package to PYTHONPATH
