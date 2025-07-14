@@ -11,10 +11,8 @@ IMPORTANT: see tmcmc_metropolis_pool docstring for setting the environment
 Francisco Ortega Culaciati
 ortega.francisco@uchile.cl
 Departamento de Geofisica - FCFM - Universidad de Chile 
-
-
 """
-import numpy as NP
+import numpy as np
 from copy import deepcopy
 from ..metropolis_in_parallel import metropolis_in_parallel_POOL
 from .calc_dbeta import calc_dbeta
@@ -69,13 +67,32 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
     
     m_ensemble = deepcopy(m0_ensemble)
     # initialize values of fprior, like and f in the initial models ensemble
-    COMPLETAR = COMPLETAR
-    
+    for m in m_ensemble.ensemble:
+        m.fprior = pdf_prior.likelihood(m)
+        m.like = likelihood_fun.likelihood(m)
+        m.f = m.fprior * (m.like ** m_ensemble.beta if not m.use_log_likelihood else
+                          np.exp(m.beta * likelihood_fun.log_likelihood(m)))
+
     # do the iterations (initial beta value must be defined in the ensemble)
     beta = m_ensemble.beta
+    acceptance_ratios = []
 
     while beta < 1:
-
         COMPLETAR = COMPLETAR
-        
+        dbeta = calc_dbeta(m_ensemble, likelihood_fun)
+        beta = min(1.0, beta + dbeta)
+        m_ensemble.beta = beta  # actualizar en el ensemble
+        for m in m_ensemble.ensemble: #para nuevo beta
+            if m.use_log_likelihood:
+                m.f = m.fprior * np.exp(beta * likelihood_fun.log_likelihood(m))
+            else:
+                m.f = m.fprior * (likelihood_fun.likelihood(m) ** beta)
+        if use_resampling:   # siii  use_resampling = true
+            m_ensemble = resampling(m_ensemble)
+
+        m_ensemble, acc_ratio = metropolis_in_parallel_POOL(   #Metropolis en paralelo
+            m_ensemble, likelihood_fun, pdf_prior, proposal,
+            num_MCMC_steps, num_proc, chunksize)
+
+        acceptance_ratios.append(acc_ratio)
     return m_ensemble, acceptance_ratios
