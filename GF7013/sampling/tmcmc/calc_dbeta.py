@@ -18,7 +18,7 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 
 
 """
-import numpy as np
+import numpy as NP
 from scipy import optimize as opt
 COMPLETAR = None
 
@@ -75,16 +75,17 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     """
     if m_ensemble.use_log_likelihood:
         # m_ensemble.like values are the natural logarithm of the likelihood function
-        loglikes = np.array([m.like for m in m_ensemble.ensemble])
-        weights = np.exp(dbeta * (loglikes - np.max(loglikes)))
+        loglikes = NP.array([m_ensemble.like])
+        weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
         #phi = COMPLETAR
     else:
         # m_ensemble.like values are of the likelihood function
-        likes = np.array([m.like for m in m_ensemble.ensemble])
+        likes = NP.array([m_ensemble.like])
         weights = likes ** dbeta
-    weights= weights/np.sum(weights)
-    ESS = 1.0 / np.sum(weights ** 2)
-    phi = ESS - effective_sample_size * len(weights) #np. sqrt?
+    weights= weights/NP.sum(weights)
+    ESS = 1.0 / NP.sum(weights ** 2)
+    print(f"dbeta: {dbeta}, ESS: {ESS}, effective_sample_size: {effective_sample_size}, weights: {weights}")
+    phi = ESS - effective_sample_size * len(weights) #NP. sqrt?
     return  phi # o el cuadrado de phi?????????
 
 # function to check if I can use or not the Brent constrained algorithm
@@ -101,13 +102,13 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
     using the unconstrained brent algorithm
     """
     if m_ensemble.use_log_likelihood:
-        loglikes = np.array([m.like for m in m_ensemble.ensemble])
-        weights = np.exp(dbeta * (loglikes - np.max(loglikes)))
+        loglikes = NP.array([m_ensemble.like])
+        weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
     else:
-        likes = np.array([m.like for m in m_ensemble.ensemble])
+        likes = NP.array([m_ensemble.like])
         weights = likes**dbeta
-    weights = weights/np.sum(weights)
-    ESS = 1.0 / np.sum(weights ** 2)
+    weights = weights/NP.sum(weights)
+    ESS = 1.0 / NP.sum(weights ** 2)
     phi = (ESS - effective_sample_size * len(weights))**2
     return phi
 
@@ -136,7 +137,7 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
 
     """
     dbeta = opt.minimize_scalar(_phi_minimize_scalar,
-                                bounds=bounds, arg=(m_ensemble, effective_sample_size),
+                                bounds=bounds, args=(m_ensemble, effective_sample_size),
                                 method='bounded', options={'xatol': tol, 'maxiter': maxiter}).x # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
     beta = m_ensemble.beta + dbeta
     

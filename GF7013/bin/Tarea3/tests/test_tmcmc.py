@@ -26,29 +26,29 @@ from GF7013.bin.Tarea2.tests.test_metropolis import pdf_bimodal
 
 def run_tmcmc(use_log_likelihood=False):
     #instancia de la pdf que usará como funcion bimodal de verosimilitud
-    f = pdf_bimodal(x_0=-2.5, sigma_0=2.0, p_0=2,
-                    x_1=14, sigma_1=0.5, p_1=1)
-
+    f = pdf_bimodal(x_0=-2.5, sigma_0=2.0, p_0=2.0,
+                    x_1=14.0, sigma_1=0.5, p_1=1.0)
+    print(f)
     # Define evaluation grid
-    x_eval = np.linspace(-15, 22, 10_000)
+    x_eval = NP.linspace(-15, 22, 10_000)
     if use_log_likelihood:
-        f_values = np.exp(np.array([f.log_likelihood(x) for x in x_eval]))
+        f_values = NP.exp(NP.array([f.log_likelihood(x) for x in x_eval]))
     else:
-        f_values = np.array([f.likelihood(x) for x in x_eval])
+        f_values = NP.array([f.likelihood(x) for x in x_eval])
     dx = x_eval[1] - x_eval[0]
-    f_area = np.sum(f_values) * dx
+    f_area = NP.sum(f_values) * dx
 
     # uniform prior
     x_min_ini = -12
     x_max_ini = 22
     prior_pdf_pars = {}
-    prior_pdf_pars['lower_lim'] = np.array([x_min_ini])
-    prior_pdf_pars['upper_lim'] = np.array([x_max_ini])
+    prior_pdf_pars['lower_lim'] = NP.array([x_min_ini])
+    prior_pdf_pars['upper_lim'] = NP.array([x_max_ini])
     fprior = pdfs.pdf_uniform_nD(par=prior_pdf_pars)
 
     # proposal distribution
     sigma_prop = (x_max_ini - (x_min_ini)) / 100
-    cov = np.array([[sigma_prop]])  # 2D array!!
+    cov = NP.array([[sigma_prop]])  # 2D array!!
     proposal_pdf = proposal_normal(cov=cov)
 
     # Ensemble
@@ -73,8 +73,8 @@ def run_tmcmc(use_log_likelihood=False):
     print(f"Razones de aceptación: {acc_ratios}") # para verificar que se calculan las razones de aceptación
 
     # Plot results
-    f_values_beta = f_values ** m.beta if not use_log_likelihood else np.exp(m.beta * (np.log(f_values + 1e-300)))
-    f_area_beta = np.sum(f_values_beta) * dx
+    f_values_beta = f_values ** m.beta if not use_log_likelihood else NP.exp(m.beta * (NP.log(f_values + 1e-300)))
+    f_area_beta = NP.sum(f_values_beta) * dx
 
     fig, axs = plt.subplots(2, 1, figsize=(8, 10), layout='constrained')
     axs[0].plot(x_eval, f_values / f_area, label='PDF bimodal original', color='cyan')
@@ -86,7 +86,7 @@ def run_tmcmc(use_log_likelihood=False):
     axs[0].legend()
 
     axs[1].scatter(m.m_set.flatten(), range(Nmodels),
-                   c=np.arange(Nmodels), cmap='rainbow', s=1)
+                   c=NP.arange(Nmodels), cmap='rainbow', s=1)
     axs[1].set_xlabel("Modelo (m)")
     axs[1].set_ylabel("Número de muestra")
     axs[1].set_title("Muestras de modelo vs. número de muestra")

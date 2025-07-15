@@ -40,15 +40,15 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
       os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
     - m0_ensemble : initial ensemble of models for the MCMC chains.
-    - likelihood_fun: an object that provides the functions likelihood_fun.likelihood(m)
-                      and likelihood_fun.log_likelihood(m) that return the value or 
+    - likelihood_fun: an object that provides the functions likelihood_fun.likelihood(m_ensamble)
+                      and likelihood_fun.log_likelihood(m_ensamble) that return the value or 
                       natural logarithm of the value of the likelihood function used
                       for the inverse problem.
-    - pdf_prior: an object that provides the functions fprior.likelihood(m) and 
-                      fprior.log_likelihood(m) that return the value or 
+    - pdf_prior: an object that provides the functions fprior.likelihood(m_ensamble) and 
+                      fprior.log_likelihood(m_ensamble) that return the value or 
                       natural logarithm of the value of the prior probability
                       function on model parameters used for the inverse problem.
-    - proposal: an object that provides the function proposal.propose(m) that returns
+    - proposal: an object that provides the function proposal.propose(m_ensamble) that returns
                a model m_test, proposed as the next step of the MCMC chain.
     - num_MCMC_steps: Number of MCMC steps of each Metropolis algorithm produced in 
                       parallel.
@@ -67,26 +67,22 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
     
     m_ensemble = deepcopy(m0_ensemble)
     # initialize values of fprior, like and f in the initial models ensemble
-    for m in m_ensemble.ensemble:
-        m.fprior = pdf_prior.likelihood(m)
-        m.like = likelihood_fun.likelihood(m)
-        m.f = m.fprior * (m.like ** m_ensemble.beta if not m.use_log_likelihood else
-                          np.exp(m.beta * likelihood_fun.log_likelihood(m)))
+    m_ensemble.f = m_ensemble.fprior * (m_ensemble.like ** m_ensemble.beta if not m_ensemble.use_log_likelihood else
+                          np.exp(m_ensemble.beta *likelihood_fun.log_likelihood(m_ensemble)))
 
     # do the iterations (initial beta value must be defined in the ensemble)
     beta = m_ensemble.beta
     acceptance_ratios = []
 
     while beta < 1:
-        COMPLETAR = COMPLETAR
-        dbeta = calc_dbeta(m_ensemble, likelihood_fun)
+        dbeta = calc_dbeta(m_ensemble)
         beta = min(1.0, beta + dbeta)
         m_ensemble.beta = beta  # actualizar en el ensemble
-        for m in m_ensemble.ensemble: #para nuevo beta
-            if m.use_log_likelihood:
-                m.f = m.fprior * np.exp(beta * likelihood_fun.log_likelihood(m))
-            else:
-                m.f = m.fprior * (likelihood_fun.likelihood(m) ** beta)
+        # for m_ensamble in m_ensemble: #para nuevo beta
+        if m_ensemble.use_log_likelihood:
+            m_ensemble.f = m_ensemble.fprior * np.exp(beta * likelihood_fun.log_likelihood(m_ensemble))
+        else:
+            m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta)
         if use_resampling:   # siii  use_resampling = true
             m_ensemble = resampling(m_ensemble)
 
