@@ -48,4 +48,5 @@ class ensemble(object):
         self.f = NP.zeros(Nmodels) # posterior distribution (log) likelihood
 
 
+
     

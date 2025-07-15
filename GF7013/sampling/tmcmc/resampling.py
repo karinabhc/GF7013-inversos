@@ -13,7 +13,7 @@ ortega.francisco@uchile.cl
 Departamento de Geofisica - FCFM - Universidad de Chile 
 
 """
-COMPLETAR = None
+#COMPLETAR = None
 import numpy as NP
 from copy import deepcopy
 def resampling(m_ensemble, dbeta):
@@ -22,16 +22,21 @@ def resampling(m_ensemble, dbeta):
     """
     # determine the weight of weach sample according to change in beta
     if m_ensemble.use_log_likelihood:
-        w = COMPLETAR
+        w = NP.exp(dbeta * m_ensemble.like)
     else:
-        w = COMPLETAR
-    w = w / NP.sum(w)
+        w = m_ensemble.like ** dbeta
+    w = w / NP.sum(w) # normalize weights
 
     # determine the frequency of selection of each model using a multinomial distribution
-    COMPLETAR = COMPLETAR
+    indices = NP.random.choice(m_ensemble.Nmodels, size=m_ensemble.Nmodels,
+                               replace=True, p=w)
+    # resample the ensemble
     # compute resampled ensemble for like**(beta + dbeta)
     m_resampled_ensemble = deepcopy(m_ensemble)
-    COMPLETAR = COMPLETAR
+    m_resampled_ensemble.m_set = m_ensemble.m_set[indices]
+    m_resampled_ensemble.fprior = m_ensemble.fprior[indices]
+    m_resampled_ensemble.like = m_ensemble.like[indices]
+    m_resampled_ensemble.f = m_ensemble.f[indices]
 
     return m_resampled_ensemble
 

@@ -135,7 +135,6 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
     computes dbeta for TMCMC using unconstrained Brent algorithm(see scipy.optimize.minimize_scalar)
 
     """
-
     dbeta = opt.minimize_scalar(_phi_minimize_scalar,
                                 bounds=bounds, arg=(m_ensemble, effective_sample_size),
                                 method='bounded', options={'xatol': tol, 'maxiter': maxiter}).x # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
@@ -145,3 +144,7 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
         return dbeta
     else:
         return 1 - m_ensemble.beta
+
+
+
+
