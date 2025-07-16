@@ -88,7 +88,7 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
 
         m_ensemble, acc_ratio = metropolis_in_parallel_POOL(   #Metropolis en paralelo
             m_ensemble, likelihood_fun, pdf_prior, proposal,
-            num_MCMC_steps, num_proc, chunksize)
+            num_MCMC_steps)
 
         acceptance_ratios.append(acc_ratio)
     return m_ensemble, acceptance_ratios

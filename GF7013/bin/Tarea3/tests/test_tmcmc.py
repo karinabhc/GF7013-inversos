@@ -23,10 +23,24 @@ from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.probability_functions import pdf as pdfs
 from GF7013.bin.Tarea2.tests.test_metropolis import pdf_bimodal
 
+class pdf_bimodal_ensemble(pdf_bimodal):    
+    def likelihood(self, m):
+        if isinstance(m, ensemble):
+            for i in range(m.Nmodels):
+                for j in range(m.Npar):
+                    return super().likelihood(m.m_set[i, j])
+        else:
+            return super().likelihood(m)
+
+    def log_likelihood(self, m):
+        return NP.log(self.likelihood(m))
+
 
 def run_tmcmc(use_log_likelihood=False):
     #instancia de la pdf que usará como funcion bimodal de verosimilitud
     f = pdf_bimodal(x_0=-2.5, sigma_0=2.0, p_0=2.0,
+                    x_1=14.0, sigma_1=0.5, p_1=1.0)
+    f2 = pdf_bimodal_ensemble(x_0=-2.5, sigma_0=2.0, p_0=2.0,
                     x_1=14.0, sigma_1=0.5, p_1=1.0)
     print(f)
     # Define evaluation grid
@@ -60,7 +74,7 @@ def run_tmcmc(use_log_likelihood=False):
                   beta=beta0)
 
     # TMCMC
-    m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f,
+    m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f2,
                                pdf_prior=fprior,
                                proposal=proposal_pdf,
                                num_MCMC_steps=100,
