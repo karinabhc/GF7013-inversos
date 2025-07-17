@@ -71,6 +71,8 @@ def run_tmcmc(use_log_likelihood=False):
     m0 = ensemble(Npar=Npar, Nmodels=Nmodels,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta0)
+    if not use_log_likelihood:
+        m0.like = NP.ones_like(m0.like)
 
     # TMCMC
     m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f2,
