@@ -47,7 +47,8 @@ def calc_dbeta(m_ensemble, effective_sample_size = 0.5,
     dbetaMAX = 1.1 - beta
     # dbetaMAX = 100 # initially I can allow beta > 1 but must truncate to beta = 1 
                    # if resulting beta is > 1.
-    bounds = NP.log(NP.array([dbetaMIN, dbetaMAX]))
+    # bounds = NP.log(NP.array([dbetaMIN, dbetaMAX]))
+    bounds = NP.array([dbetaMIN, dbetaMAX])
     if can_use_brent_constrained(bounds[0], bounds[1], m_ensemble, effective_sample_size): 
         # can use constrained version.
         print('Calculating dbeta using CONSTRAINED Brent algorithm')
@@ -75,8 +76,10 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     """
     if m_ensemble.use_log_likelihood:
         # m_ensemble.like values are the natural logarithm of the likelihood function
+        dbeta = NP.log(dbeta)
         loglikes = NP.array([m_ensemble.like])
         weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
+        dbeta = NP.exp(dbeta)
         #phi = COMPLETAR
     else:
         # m_ensemble.like values are of the likelihood function
@@ -102,8 +105,10 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
     using the unconstrained brent algorithm
     """
     if m_ensemble.use_log_likelihood:
+        dbeta = NP.log(dbeta)
         loglikes = NP.array([m_ensemble.like])
         weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
+        dbeta = NP.exp(dbeta)
     else:
         likes = NP.array([m_ensemble.like])
         weights = likes**dbeta
