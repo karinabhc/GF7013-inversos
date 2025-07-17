@@ -14,21 +14,23 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 
 """
 #COMPLETAR = None
-import numpy as NP
+import numpy as np
 from copy import deepcopy
+
+
 def resampling(m_ensemble, dbeta):
     """
     Resampling for a step in the TMCMC algorithm.
     """
     # determine the weight of weach sample according to change in beta
     if m_ensemble.use_log_likelihood:
-        w = NP.exp(dbeta * m_ensemble.like)
+        w = np.exp(dbeta * m_ensemble.like) #Caso 2
     else:
-        w = m_ensemble.like ** dbeta
-    w = w / NP.sum(w) # normalize weights
+        w = m_ensemble.like ** dbeta #Caso 1
+    w = w / np.sum(w) # normalize weights
 
     # determine the frequency of selection of each model using a multinomial distribution
-    indices = NP.random.choice(m_ensemble.Nmodels, size=m_ensemble.Nmodels,
+    indices = np.random.choice(m_ensemble.Nmodels, size=m_ensemble.Nmodels,
                                replace=True, p=w)
     # resample the ensemble
     # compute resampled ensemble for like**(beta + dbeta)
