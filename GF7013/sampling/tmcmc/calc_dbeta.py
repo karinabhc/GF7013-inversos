@@ -82,7 +82,7 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
         # m_ensemble.like values are of the likelihood function
         likes = NP.array([m_ensemble.like])
         weights = likes ** dbeta
-    weights= weights/NP.sum(weights)
+    weights= weights/NP.sum(weights) if weights != NP.zeros_like(weights) else weights
     ESS = 1.0 / NP.sum(weights ** 2)
     print(f"dbeta: {dbeta}, ESS: {ESS}, effective_sample_size: {effective_sample_size}, weights: {weights}")
     phi = ESS - effective_sample_size * len(weights) #NP. sqrt?
