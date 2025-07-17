@@ -24,7 +24,7 @@ COMPLETAR = None
 
 def calc_dbeta(m_ensemble, effective_sample_size = 0.5, 
                tol = 1E-12, maxiter = 1000,
-               dbetaMIN = 1E-9):
+               dbetaMIN = 1E-6):
     """
     computes dbeta for TMCMC algorithm.
     - m_ensemble : ensemble of samples (an ensemble class).
@@ -45,7 +45,7 @@ def calc_dbeta(m_ensemble, effective_sample_size = 0.5,
 
     beta = m_ensemble.beta
     dbetaMAX = 1.1 - beta
-    dbetaMAX = 100 # initially I can allow beta > 1 but must truncate to beta = 1 
+    # dbetaMAX = 100 # initially I can allow beta > 1 but must truncate to beta = 1 
                    # if resulting beta is > 1.
     bounds = (dbetaMIN, dbetaMAX)
     if can_use_brent_constrained(dbetaMIN, dbetaMAX, m_ensemble, effective_sample_size): 
@@ -82,7 +82,7 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
         # m_ensemble.like values are of the likelihood function
         likes = NP.array([m_ensemble.like])
         weights = likes ** dbeta
-    weights= weights/NP.sum(weights) if weights != NP.zeros_like(weights) else weights
+    weights= NP.ones_like(weights) if weights.all()== 0 else weights/NP.sum(weights)
     ESS = 1.0 / NP.sum(weights ** 2)
     print(f"dbeta: {dbeta}, ESS: {ESS}, effective_sample_size: {effective_sample_size}, weights: {weights}")
     phi = ESS - effective_sample_size * len(weights) #NP. sqrt?

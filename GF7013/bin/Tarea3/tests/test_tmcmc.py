@@ -27,8 +27,7 @@ class pdf_bimodal_ensemble(pdf_bimodal):
     def likelihood(self, m):
         if isinstance(m, ensemble):
             for i in range(m.Nmodels):
-                for j in range(m.Npar):
-                    return super().likelihood(m.m_set[i, j])
+                    return super().likelihood(m.m_set[i, :])
         else:
             return super().likelihood(m)
 
