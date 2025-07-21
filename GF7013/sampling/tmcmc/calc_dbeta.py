@@ -20,11 +20,10 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 """
 import numpy as NP
 from scipy import optimize as opt
-COMPLETAR = None
 
 def calc_dbeta(m_ensemble, effective_sample_size = 0.5, 
                tol = 1E-12, maxiter = 1000,
-               dbetaMIN = 1E-6):
+               dbetaMIN = 1E-8):
     """
     computes dbeta for TMCMC algorithm.
     - m_ensemble : ensemble of samples (an ensemble class).
@@ -42,15 +41,13 @@ def calc_dbeta(m_ensemble, effective_sample_size = 0.5,
     of the boolean variable m_ensemble.use_log_likelihood
 
     """
-
-    beta = m_ensemble.beta  # log_beta = 0
-    dbetaMAX = 1.1 - beta   
+    beta = m_ensemble.beta
+    dbetaMAX = 1.1 - beta
     # dbetaMAX = 100 # initially I can allow beta > 1 but must truncate to beta = 1 
                    # if resulting beta is > 1.
     # bounds = NP.log(NP.array([dbetaMIN, dbetaMAX]))
     bounds = NP.log([dbetaMIN, dbetaMAX])  # dbetaMIN y dbtaMAX son log_dbeta
     if can_use_brent_constrained(bounds[0], bounds[1], m_ensemble, effective_sample_size): 
-        # can use constrained version.
         print('Calculating dbeta using CONSTRAINED Brent algorithm')
         d_beta = _dbeta_brent_constrained(m_ensemble,
                                         bounds=bounds,
@@ -75,24 +72,17 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     """
     defines the objective function to minimize when calculating delta_beta (dbeta)
     using the constrained brent algorithm
-
     """
-    # dbeta = log_dbeta
-    
-    if m_ensemble.use_log_likelihood:
-        # m_ensemble.like values are the natural logarithm of the likelihood function
-        loglikes = m_ensemble.like
-        weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
-        dbeta = NP.exp(dbeta)
-        #phi = COMPLETAR
-    else:
-        # m_ensemble.like values are of the likelihood function
-        likes = m_ensemble.like
-        print(likes.shape)
-        weights = likes ** NP.exp(dbeta)
-    weights= weights/NP.sum(weights)
-    ESS = 1.0 / NP.sum(weights ** 2)
-    phi = ESS - effective_sample_size * len(weights) 
+    if m_ensemble.use_log_likelihood:   # m_ensemble.like values are the natural logarithm of the likelihood function
+        loglikes = NP.asarray([m_ensemble.like]) #weights
+        w = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
+        
+    else:        # m_ensemble.like values are of the likelihood function
+        likes = NP.asarray([m_ensemble.like])
+        w = likes ** dbeta  #weights
+    w /= NP.sum(w)  # Normalize weights
+    ESS_target = 1.0 / NP.sum(w ** 2)
+    phi = ESS_target - effective_sample_size * len(w) 
     return  phi 
 
 # function to check if I can use or not the Brent constrained algorithm
@@ -109,17 +99,16 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
     using the unconstrained brent algorithm
     """
     if m_ensemble.use_log_likelihood:
-        # dbeta = NP.log(dbeta)
-        loglikes = m_ensemble.like
-        ln_weights = dbeta * (loglikes - NP.max(loglikes))
-        weights = NP.exp(ln_weights)
+        dbeta = NP.log(dbeta)
+        loglikes = NP.array([m_ensemble.like])
+        w = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
         dbeta = NP.exp(dbeta)
     else:
-        likes = m_ensemble.like
-        weights = likes**NP.exp(dbeta)
-    weights = weights/NP.sum(weights)
-    ESS = 1.0 / NP.sum(weights ** 2)
-    phi = (ESS - effective_sample_size * len(weights))**2
+        likes = NP.array([m_ensemble.like])
+        w = likes ** dbeta  #weights
+    w /= NP.sum(w)  # Normalize weights
+    ESS_target = 1.0 / NP.sum(w ** 2)
+    phi = (ESS_target - effective_sample_size * len(w))**2
     return phi
 
 

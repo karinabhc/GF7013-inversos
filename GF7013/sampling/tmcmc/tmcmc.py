@@ -88,25 +88,28 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
         
     # do the iterations (initial beta value must be defined in the ensemble)
     beta = m_ensemble.beta
+    use_log = m_ensemble.use_log_likelihood
     acceptance_ratios = []
 
     while beta < 1:
         dbeta = calc_dbeta(m_ensemble)
-        beta = min(1.0, beta + dbeta)
-        print(f'beta_previo:{ m_ensemble.beta}') 
-        m_ensemble.beta = beta  # actualizar en el ensemble
-        print(f'beta_nuevo:{ m_ensemble.beta}\n')
+        beta_new = min(1.0, beta + dbeta)
+        m_ensemble.beta = beta_new  
+        beta = beta_new  # actualizar variable
         # for m_ensamble in m_ensemble: #para nuevo beta
         if m_ensemble.use_log_likelihood:
-            m_ensemble.f = m_ensemble.fprior * np.exp(beta * likelihood_fun.log_likelihood(m_ensemble))
+            m_ensemble.f = m_ensemble.fprior * np.exp(beta_new * likelihood_fun.log_likelihood(m_ensemble))
         else:
-            m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta)
+            m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta_new)
+        
         if use_resampling:   # siii  use_resampling = true
             m_ensemble = resampling(m_ensemble)
-
+ 
         m_ensemble, acc_ratio = metropolis_in_parallel_POOL(   #Metropolis en paralelo
             m_ensemble, likelihood_fun, pdf_prior, proposal,
             num_MCMC_steps)
+        print(f"dbeta = {dbeta:.3E} --> beta_new = {beta_new:.3E}, acept = {acc_ratio}")
+        acceptance_ratios.append(acc_ratio)
 
         acceptance_ratios.append(np.mean(acc_ratio))
     return m_ensemble, acceptance_ratios

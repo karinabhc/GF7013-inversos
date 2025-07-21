@@ -86,9 +86,9 @@ def run_tmcmc(use_log_likelihood=False):
                                chunksize=1,
                                use_resampling=False)
 
-    print(f"TMCMC terminado con use_log_likelihood={use_log_likelihood}")  # para verificar que se ejecuta
-    print(f"Beta final: {m.beta:.4f}") #para verificar que se actualiza beta
-    print(f"Razones de aceptación: {acc_ratios}") # para verificar que se calculan las razones de aceptación
+    #print(f"TMCMC terminado con use_log_likelihood={use_log_likelihood}")  # para verificar que se ejecuta
+    #print(f"Beta final: {m.beta:.4f}") #para verificar que se actualiza beta
+    #print(f"Razones de aceptación: {acc_ratios}") # para verificar que se calculan las razones de aceptación
 
     # Plot results
     f_values_beta = f_values ** m.beta if not use_log_likelihood else NP.exp(m.beta * (NP.log(f_values + 1e-300)))
