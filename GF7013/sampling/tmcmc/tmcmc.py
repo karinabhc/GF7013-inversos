@@ -77,7 +77,9 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
     while beta < 1:
         dbeta = calc_dbeta(m_ensemble)
         beta = min(1.0, beta + dbeta)
+        print(f'beta_previo:{ m_ensemble.beta}') 
         m_ensemble.beta = beta  # actualizar en el ensemble
+        print(f'beta_nuevo:{ m_ensemble.beta}\n')
         # for m_ensamble in m_ensemble: #para nuevo beta
         if m_ensemble.use_log_likelihood:
             m_ensemble.f = m_ensemble.fprior * np.exp(beta * likelihood_fun.log_likelihood(m_ensemble))
