@@ -20,11 +20,10 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 """
 import numpy as NP
 from scipy import optimize as opt
-COMPLETAR = None
 
 def calc_dbeta(m_ensemble, effective_sample_size = 0.5, 
                tol = 1E-12, maxiter = 1000,
-               dbetaMIN = 1E-6):
+               dbetaMIN = 1E-8):
     """
     computes dbeta for TMCMC algorithm.
     - m_ensemble : ensemble of samples (an ensemble class).
@@ -42,7 +41,6 @@ def calc_dbeta(m_ensemble, effective_sample_size = 0.5,
     of the boolean variable m_ensemble.use_log_likelihood
 
     """
-
     beta = m_ensemble.beta
     dbetaMAX = 1.1 - beta
     # dbetaMAX = 100 # initially I can allow beta > 1 but must truncate to beta = 1 
@@ -50,21 +48,13 @@ def calc_dbeta(m_ensemble, effective_sample_size = 0.5,
     # bounds = NP.log(NP.array([dbetaMIN, dbetaMAX]))
     bounds = NP.array([dbetaMIN, dbetaMAX])
     if can_use_brent_constrained(bounds[0], bounds[1], m_ensemble, effective_sample_size): 
-        # can use constrained version.
         print('Calculating dbeta using CONSTRAINED Brent algorithm')
-        return _dbeta_brent_constrained(m_ensemble,
-                                        bounds=bounds,
-                                        effective_sample_size = effective_sample_size,
-                                        tol = tol, 
-                                        maxiter = maxiter)
-    else:
+        return _dbeta_brent_constrained(m_ensemble, bounds=bounds, effective_sample_size = effective_sample_size,
+                                        tol = tol, maxiter = maxiter)
+    else:        # if constrained version does not work, try to a lESS_target restrictive approach
         print('Calculating dbeta using alternate bounded minimize_scalar algorithm')
-        # if constrained version does not work, try to a less restrictive approach
-        return _dbeta_bounded(m_ensemble, 
-                              bounds = bounds, 
-                              effective_sample_size = effective_sample_size, 
-                              tol = tol, 
-                              maxiter = maxiter)
+        return _dbeta_bounded(m_ensemble, bounds = bounds, effective_sample_size = effective_sample_size, 
+                              tol = tol, maxiter = maxiter)
 
 
 # objective function for Brent algorithm
@@ -72,24 +62,18 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     """
     defines the objective function to minimize when calculating delta_beta (dbeta)
     using the constrained brent algorithm
-
     """
-    if m_ensemble.use_log_likelihood:
-        # m_ensemble.like values are the natural logarithm of the likelihood function
-        dbeta = NP.log(dbeta)
-        loglikes = NP.array([m_ensemble.like])
-        weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
-        dbeta = NP.exp(dbeta)
-        #phi = COMPLETAR
-    else:
-        # m_ensemble.like values are of the likelihood function
-        likes = NP.array([m_ensemble.like])
-        weights = likes ** dbeta
-    weights= weights/NP.sum(weights)
-    ESS = 1.0 / NP.sum(weights ** 2)
-    print(f"dbeta: {dbeta}, ESS: {ESS}, effective_sample_size: {effective_sample_size}, weights: {weights}")
-    phi = ESS - effective_sample_size * len(weights) #NP. sqrt?
-    return  phi # o el cuadrado de phi?????????
+    if m_ensemble.use_log_likelihood:   # m_ensemble.like values are the natural logarithm of the likelihood function
+        loglikes = NP.asarray([m_ensemble.like]) #weights
+        w = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
+        
+    else:        # m_ensemble.like values are of the likelihood function
+        likes = NP.asarray([m_ensemble.like])
+        w = likes ** dbeta  #weights
+    w /= NP.sum(w)  # Normalize weights
+    ESS_target = 1.0 / NP.sum(w ** 2)
+    phi = ESS_target - effective_sample_size * len(w) 
+    return  phi 
 
 # function to check if I can use or not the Brent constrained algorithm
 def can_use_brent_constrained(dbetaMIN, dbetaMAX,  m_ensemble, effective_sample_size):    
@@ -107,14 +91,14 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
     if m_ensemble.use_log_likelihood:
         dbeta = NP.log(dbeta)
         loglikes = NP.array([m_ensemble.like])
-        weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
+        w = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
         dbeta = NP.exp(dbeta)
     else:
         likes = NP.array([m_ensemble.like])
-        weights = likes**dbeta
-    weights = weights/NP.sum(weights)
-    ESS = 1.0 / NP.sum(weights ** 2)
-    phi = (ESS - effective_sample_size * len(weights))**2
+        w = likes ** dbeta  #weights
+    w /= NP.sum(w)  # Normalize weights
+    ESS_target = 1.0 / NP.sum(w ** 2)
+    phi = (ESS_target - effective_sample_size * len(w))**2
     return phi
 
 
@@ -141,9 +125,11 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
     computes dbeta for TMCMC using unconstrained Brent algorithm(see scipy.optimize.minimize_scalar)
 
     """
-    dbeta = opt.minimize_scalar(_phi_minimize_scalar,
+    result = opt.minimize_scalar(_phi_minimize_scalar,
                                 bounds=bounds, args=(m_ensemble, effective_sample_size),
-                                method='bounded', options={'xatol': tol, 'maxiter': maxiter}).x # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
+                                method='bounded', options={'xatol': tol, 'maxiter': maxiter})
+    # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
+    dbeta= result.x
     beta = m_ensemble.beta + dbeta
     
     if beta < 1.0:
