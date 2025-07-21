@@ -23,11 +23,15 @@ from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.probability_functions import pdf as pdfs
 from GF7013.bin.Tarea2.tests.test_metropolis import pdf_bimodal
 
-class pdf_bimodal_ensemble(pdf_bimodal):    
+class pdf_bimodal_ensemble(pdf_bimodal):   
+    def __f(self, x, mean, sigma, p):
+        alpha = 1 / sigma / NP.sqrt(2*NP.pi)
+        result = alpha * NP.exp(-0.5*(NP.sum(NP.abs((x.m_set - mean)/sigma)**p, axis=1)))
+        return result
+    
     def likelihood(self, m):
         if isinstance(m, ensemble):
-            for i in range(m.Nmodels):
-                    return super().likelihood(m.m_set[i, :])
+            return self.__f(m, *self.args_f0) + self.__f(m, *self.args_f1)
         else:
             return super().likelihood(m)
 
@@ -71,8 +75,7 @@ def run_tmcmc(use_log_likelihood=False):
     m0 = ensemble(Npar=Npar, Nmodels=Nmodels,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta0)
-    if not use_log_likelihood:
-        m0.like = NP.ones_like(m0.like)
+    
 
     # TMCMC
     m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f2,

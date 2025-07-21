@@ -81,13 +81,14 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     
     if m_ensemble.use_log_likelihood:
         # m_ensemble.like values are the natural logarithm of the likelihood function
-        loglikes = NP.array([m_ensemble.like])
+        loglikes = m_ensemble.like
         weights = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
         dbeta = NP.exp(dbeta)
         #phi = COMPLETAR
     else:
         # m_ensemble.like values are of the likelihood function
-        likes = NP.array([m_ensemble.like])
+        likes = m_ensemble.like
+        print(likes.shape)
         weights = likes ** NP.exp(dbeta)
     weights= weights/NP.sum(weights)
     ESS = 1.0 / NP.sum(weights ** 2)

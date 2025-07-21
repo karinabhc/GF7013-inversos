@@ -74,7 +74,7 @@ def metropolis_in_parallel_POOL(m0, likelihood_fun,
     arg_metropolis = [(
                        m0.m_set[i, :], likelihood_fun, 
                        pdf_prior, proposal, 1, num_MCMC_steps-1, 
-                       use_log_likelihood, True, m0.beta)
+                       use_log_likelihood, False, m0.beta)
                       for i in range(Nm)
                       ]
     
