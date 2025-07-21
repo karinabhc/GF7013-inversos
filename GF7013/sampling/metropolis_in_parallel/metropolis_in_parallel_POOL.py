@@ -83,7 +83,7 @@ def metropolis_in_parallel_POOL(m0, likelihood_fun,
         results = pool.starmap(metropolis, arg_metropolis, chunksize=1)
     
 
-    m = ensemble(Npar=Npar, Nmodels=Nm, use_log_likelihood=True,beta=1) # this is the final ensemble after Metropolis in Parallel.
+    m = ensemble(Npar=Npar, Nmodels=Nm, use_log_likelihood=True, beta=m0.beta) # this is the final ensemble after Metropolis in Parallel.
     acceptance_ratios = NP.zeros(Nm) # a 1D numpy array with the acceptance ratio of each
                                   # MCMC chain.
    
