@@ -40,12 +40,12 @@ class pdf_bimodal_ensemble(pdf_bimodal):
 
 
 def run_tmcmc(use_log_likelihood=False):
+    print(f"\nInicia test TMCMC con use_log_likelihood={use_log_likelihood}:")
     #instancia de la pdf que usará como funcion bimodal de verosimilitud
     f = pdf_bimodal(x_0=-2.5, sigma_0=2.0, p_0=2.0,
                     x_1=14.0, sigma_1=0.5, p_1=1.0)
     f2 = pdf_bimodal_ensemble(x_0=-2.5, sigma_0=2.0, p_0=2.0,
                     x_1=14.0, sigma_1=0.5, p_1=1.0)
-    print(f)
     # Define evaluation grid
     x_eval = NP.linspace(-15, 22, 10_000)
     if use_log_likelihood:
@@ -86,9 +86,9 @@ def run_tmcmc(use_log_likelihood=False):
                                chunksize=1,
                                use_resampling=False)
 
-    #print(f"TMCMC terminado con use_log_likelihood={use_log_likelihood}")  # para verificar que se ejecuta
-    #print(f"Beta final: {m.beta:.4f}") #para verificar que se actualiza beta
-    #print(f"Razones de aceptación: {acc_ratios}") # para verificar que se calculan las razones de aceptación
+    print(f"TMCMC terminado con use_log_likelihood={use_log_likelihood}")  # para verificar que se ejecuta
+    print(f"Beta final: {m.beta:.4f}") #para verificar que se actualiza beta
+    print(f"Razones de aceptación: {acc_ratios}") # para verificar que se calculan las razones de aceptación
 
     # Plot results
     f_values_beta = f_values ** m.beta if not use_log_likelihood else NP.exp(m.beta * (NP.log(f_values + 1e-300)))

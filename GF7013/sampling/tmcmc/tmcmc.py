@@ -70,25 +70,26 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
     # m_ensemble.f = m_ensemble.fprior * (m_ensemble.like ** m_ensemble.beta if not m_ensemble.use_log_likelihood else
                         #   np.exp(m_ensemble.beta *likelihood_fun.log_likelihood(m_ensemble)))
 
-    # Inicializa likelihood y f antes de comenzar TMCMC
-    if m_ensemble.use_log_likelihood:
-        for i in range(m_ensemble.Nmodels):
-            m_ensemble.like[i] = likelihood_fun.log_likelihood(np.array([m_ensemble.m_set[i, :]]))
-        print(m_ensemble.like)
-        m_ensemble.f = m_ensemble.fprior * np.exp(m_ensemble.beta * m_ensemble.like)
-    # else:
-    #     m_ensemble.like = np.ones_like(m_ensemble.like)
-    #     m_ensemble.fprior = np.ones_like(m_ensemble.like)
-    #     for i in range(m_ensemble.Nmodels):
-    #         m_ensemble.like[i] = likelihood_fun.likelihood(np.array([m_ensemble.m_set[i, :]]))
-    #     print(m_ensemble.like)
+    use_log = m_ensemble.use_log_likelihood
 
-    #     m_ensemble.f = m_ensemble.fprior * (m_ensemble.like ** m_ensemble.beta)
+    # Inicializa likelihood y f antes de comenzar TMCMC
+    if use_log:
+        for i in range(m_ensemble.Nmodels):
+            m_ensemble.like[i] = likelihood_fun.log_likelihood(m_ensemble.m_set[i, :])
+        print("m0_inicial.like:", m_ensemble.like)
+        m_ensemble.f = m_ensemble.fprior * np.exp(m_ensemble.beta * m_ensemble.like)
+    else:
+        m_ensemble.like = np.exp(m_ensemble.like)  
+        # m_ensemble.fprior = np.exp(m_ensemble.fprior)
+        for i in range(m_ensemble.Nmodels):
+            m_ensemble.like[i] = likelihood_fun.likelihood(m_ensemble.m_set[i, :])
+        print("m0_inicial.like:", m_ensemble.like)
+
+        m_ensemble.f = m_ensemble.fprior * (m_ensemble.like ** m_ensemble.beta)
         
         
     # do the iterations (initial beta value must be defined in the ensemble)
     beta = m_ensemble.beta
-    use_log = m_ensemble.use_log_likelihood
     acceptance_ratios = []
 
     while beta < 1:
@@ -97,7 +98,7 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
         m_ensemble.beta = beta_new  
         beta = beta_new  # actualizar variable
         # for m_ensamble in m_ensemble: #para nuevo beta
-        if m_ensemble.use_log_likelihood:
+        if use_log:
             m_ensemble.f = m_ensemble.fprior * np.exp(beta_new * likelihood_fun.log_likelihood(m_ensemble))
         else:
             m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta_new)
@@ -107,9 +108,8 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
  
         m_ensemble, acc_ratio = metropolis_in_parallel_POOL(   #Metropolis en paralelo
             m_ensemble, likelihood_fun, pdf_prior, proposal,
-            num_MCMC_steps)
+            num_MCMC_steps, use_log)
         print(f"dbeta = {dbeta:.3E} --> beta_new = {beta_new:.3E}, acept = {acc_ratio}")
-        acceptance_ratios.append(acc_ratio)
-
+        
         acceptance_ratios.append(np.mean(acc_ratio))
     return m_ensemble, acceptance_ratios
