@@ -81,7 +81,7 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
         # dbeta = NP.exp(dbeta)
         loglikes = NP.log(NP.asarray([m_ensemble.like]))
     dbeta = NP.exp(dbeta)
-    w = NP.exp((loglikes - NP.max(loglikes)))**dbeta
+    w = NP.exp((loglikes - NP.max(loglikes)))**dbeta # evita errores numericos (overflow)
     w /= NP.sum(w)  # Normalize weights
     ESS_target = 1.0 / NP.sum(w ** 2)
     phi = ESS_target - effective_sample_size * len(w) 
@@ -107,7 +107,7 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
         loglikes = NP.log(NP.asarray([m_ensemble.like]))
     dbeta = NP.exp(dbeta)
 
-    w = NP.exp((loglikes - NP.max(loglikes)))**dbeta
+    w = NP.exp((loglikes - NP.max(loglikes)))**dbeta # evita errores numericos (overflow)
     w /= NP.sum(w)  # Normalize weights
     ESS_target = 1.0 / NP.sum(w ** 2)
     phi = (ESS_target - effective_sample_size * len(w))**2
