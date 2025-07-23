@@ -104,7 +104,7 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
             m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta_new)
         
         if use_resampling:   # siii  use_resampling = true
-            m_ensemble = resampling(m_ensemble)
+            m_ensemble = resampling(m_ensemble,dbeta)
  
         m_ensemble, acc_ratio = metropolis_in_parallel_POOL(   #Metropolis en paralelo
             m_ensemble, likelihood_fun, pdf_prior, proposal,
