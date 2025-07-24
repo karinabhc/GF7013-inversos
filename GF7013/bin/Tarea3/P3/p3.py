@@ -1,9 +1,4 @@
 import os
-import sys
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-
 # Configuración para multiprocessing con numpy
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1"
@@ -11,6 +6,12 @@ os.environ["MKL_DOMAIN_NUM_THREADS"] = "1"
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+
 
 # Ruta al paquete GF7013
 this_module_folder = os.path.dirname(os.path.abspath(__file__))
