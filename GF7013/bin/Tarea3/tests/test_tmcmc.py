@@ -75,7 +75,7 @@ def run_tmcmc(use_log_likelihood=False):
     m0 = ensemble(Npar=Npar, Nmodels=Nmodels,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta0)
-    
+    m0.m_set = fprior.draw(Nmodels).T
 
     # TMCMC
     m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f2,
