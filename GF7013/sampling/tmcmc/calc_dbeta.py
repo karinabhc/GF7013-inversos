@@ -74,12 +74,12 @@ def _phi_brent_constrained(dbeta, m_ensemble, effective_sample_size):
     """
     # remember that lndbeta = dbeta 
     if m_ensemble.use_log_likelihood:   # m_ensemble.like values are the natural logarithm of the likelihood function
-        loglikes = NP.asarray([m_ensemble.like]) #weights
+        loglikes = NP.asarray(m_ensemble.like) #weights
         # w = NP.exp(dbeta * (loglikes - NP.max(loglikes)))
         
     else:        # m_ensemble.like values are of the likelihood function
         # dbeta = NP.exp(dbeta)
-        loglikes = NP.log(NP.asarray([m_ensemble.like]))
+        loglikes = NP.log(NP.asarray(m_ensemble.like)+1E-300)  
     dbeta = NP.exp(dbeta)
     w = NP.exp((loglikes - NP.max(loglikes)))**dbeta # evita errores numericos (overflow)
     w /= NP.sum(w)  # Normalize weights
@@ -102,9 +102,9 @@ def _phi_minimize_scalar(dbeta, m_ensemble, effective_sample_size):
     """
     # remember that lndbeta = dbeta 
     if m_ensemble.use_log_likelihood:
-        loglikes = NP.asarray([m_ensemble.like])
+        loglikes = NP.asarray(m_ensemble.like)
     else:
-        loglikes = NP.log(NP.asarray([m_ensemble.like]))
+        loglikes = NP.log(NP.asarray(m_ensemble.like))
     dbeta = NP.exp(dbeta)
 
     w = NP.exp((loglikes - NP.max(loglikes)))**dbeta # evita errores numericos (overflow)
@@ -149,7 +149,3 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
         return dbeta
     else:
         return 1 - m_ensemble.beta
-
-
-
-

@@ -73,14 +73,12 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
     use_log = m_ensemble.use_log_likelihood
 
     # Inicializa likelihood y f antes de comenzar TMCMC
-    if use_log:
+    if use_log: #true
         for i in range(m_ensemble.Nmodels):
             m_ensemble.like[i] = likelihood_fun.log_likelihood(m_ensemble.m_set[i, :])
         print("m0_inicial.like:", m_ensemble.like)
-        m_ensemble.f = m_ensemble.fprior * np.exp(m_ensemble.beta * m_ensemble.like)
-    else:
-        m_ensemble.like = np.exp(m_ensemble.like)  
-        # m_ensemble.fprior = np.exp(m_ensemble.fprior)
+        m_ensemble.f = m_ensemble.fprior + (m_ensemble.beta * m_ensemble.like)
+    else:       #false
         for i in range(m_ensemble.Nmodels):
             m_ensemble.like[i] = likelihood_fun.likelihood(m_ensemble.m_set[i, :])
         print("m0_inicial.like:", m_ensemble.like)
@@ -99,7 +97,7 @@ def tmcmc_pool(m0_ensemble, likelihood_fun, pdf_prior, proposal,
         beta = beta_new  # actualizar variable
         # for m_ensamble in m_ensemble: #para nuevo beta
         if use_log:
-            m_ensemble.f = m_ensemble.fprior * np.exp(beta_new * likelihood_fun.log_likelihood(m_ensemble))
+            m_ensemble.f = m_ensemble.fprior + beta_new * likelihood_fun.log_likelihood(m_ensemble)
         else:
             m_ensemble.f = m_ensemble.fprior * (likelihood_fun.likelihood(m_ensemble) ** beta_new)
         
