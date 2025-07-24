@@ -105,7 +105,8 @@ m0 = ensemble(
             ) # fprior.draw()
 
 # generamos los modelos iniciales como muestras de fprior
-m0.m_set[:] = fprior.draw()
+m0.m_set = fprior.draw(NumSamples).T
+
 
 
 m,acceptance_ratios = metropolis_in_parallel_POOL(m0,likelihood_fun=likelihood_fun,
