@@ -76,7 +76,6 @@ def run_tmcmc(use_log_likelihood=False):
                   use_log_likelihood=use_log_likelihood,
                   beta=beta0)
     m0.m_set = fprior.draw(Nmodels).T
-
     # TMCMC
     m, acc_ratios = tmcmc_pool(m0, likelihood_fun=f2,
                                pdf_prior=fprior,
