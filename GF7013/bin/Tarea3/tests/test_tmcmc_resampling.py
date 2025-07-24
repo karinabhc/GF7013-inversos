@@ -21,7 +21,7 @@ sys.path.append(GF7013_path)
 
 # Import from GF7013 package
 from GF7013.model_parameters import ensemble
-from GF7013.sampling.tmcmc.tmcmc_resampling import tmcmc_pool
+from GF7013.sampling.tmcmc.tmcmc import tmcmc_pool
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.probability_functions import pdf as pdfs
 from GF7013.bin.Tarea2.tests.test_metropolis import pdf_bimodal
