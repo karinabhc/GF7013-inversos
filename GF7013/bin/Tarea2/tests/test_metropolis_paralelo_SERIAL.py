@@ -66,17 +66,17 @@ if __name__ == '__main__':
     # define initial model:
     Npar = 1
     NumSamples = int(1E5)
-    use_log_likelihood = True
     beta = 1
     numStepChains = 300
     m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
-                  use_log_likelihood=use_log_likelihood,
-                  beta=beta)
+                  use_log_likelihood=False,
+                  beta=beta)    
+    m0.m_set = fprior.draw(NumSamples).T
     m, acceptance_ratios = metropolis_in_parallel_SERIAL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,
                                             num_MCMC_steps=numStepChains,
-                                            use_log_likelihood=use_log_likelihood
+                                            use_log_likelihood=False
                                             )
 
     print(m.m_set.flatten())

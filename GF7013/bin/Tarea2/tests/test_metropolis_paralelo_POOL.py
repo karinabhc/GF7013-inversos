@@ -85,7 +85,7 @@ if __name__ == '__main__':
     m0 = ensemble(Npar = Npar, Nmodels=NumSamples,
                   use_log_likelihood=use_log_likelihood,
                   beta=beta)
-    
+    m0.m_set = fprior.draw(NumSamples).T
     m,acceptance_ratios = metropolis_in_parallel_POOL(m0,likelihood_fun=f,
                                             pdf_prior=fprior,
                                             proposal=proposal_pdf,
