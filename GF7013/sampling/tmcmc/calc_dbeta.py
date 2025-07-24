@@ -141,7 +141,7 @@ def _dbeta_bounded(m_ensemble, bounds, effective_sample_size,
     """
     lndbeta = opt.minimize_scalar(_phi_minimize_scalar,
                                 bounds=bounds, args=(m_ensemble, effective_sample_size),
-                                method='Bounded, tol=tol, options={'maxiter': maxiter}).x # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
+                                method='Bounded', tol=tol, options={'maxiter': maxiter}).x # el .x es el valor de dbeta porque minimize_scalar devuelve un objeto OptimizeResult que contiene el valor de la funcion objetivo y el valor de dbeta
     dbeta = NP.exp(lndbeta) 
     beta = m_ensemble.beta + dbeta
     
