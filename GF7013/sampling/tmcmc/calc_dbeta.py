@@ -23,7 +23,7 @@ from scipy import optimize as opt
 
 def calc_dbeta(m_ensemble, effective_sample_size = 0.5, 
                tol = 1E-12, maxiter = 1000,
-               dbetaMIN = 1E-6):
+               dbetaMIN = 1E-5):
     """
     computes dbeta for TMCMC algorithm.
     - m_ensemble : ensemble of samples (an ensemble class).
