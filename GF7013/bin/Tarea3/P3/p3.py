@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
 
     # Ensemble inicial
-    Nmodels = 10000
+    Nmodels = 50_000
     beta0 = 0.0
     m0 = ensemble(Npar=2, Nmodels=Nmodels, use_log_likelihood=use_log_likelihood, beta=beta0)
     m0.m_set = fprior.draw(Nmodels).T
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     m_final, acc_ratios = tmcmc_pool(m0, likelihood_fun,
                                 pdf_prior=fprior,
                                 proposal=proposal,
-                                num_MCMC_steps=100,
+                                num_MCMC_steps=300,
                                 num_proc=4,
                                 chunksize=1,
                                 use_resampling=True)
@@ -130,80 +130,80 @@ if __name__ == "__main__":
 
     # Extraer muestras
     #cadenas?
-    a_samples = m_final.m_set[:, 0]
-    theta_samples = m_final.m_set[:, 1]
+    a_samples_prior = m0.m_set[:, 0]
+    theta_samples_prior = m0.m_set[:, 1]
+    a_samples_post = m_final.m_set[:, 0]
+    theta_samples_post = m_final.m_set[:, 1]
 
 
-    # --- Graficar evolución de parámetros ---
-    fig = plt.figure(figsize=(10, 6))
-    ax = fig.add_subplot(111)
+    # # --- Graficar evolución de parámetros ---
+    # fig = plt.figure(figsize=(10, 6), layout='constrained')
+    # ax = fig.add_subplot(111)
 
-    sc=ax.scatter(a_samples,theta_samples,alpha=0.7,c=np.arange(len(a_samples)),cmap='rainbow')
-    plt.colorbar(sc, ax=ax, label='Índice de Muestra')
-    ax.set_xlabel('a')
-    ax.set_ylabel('theta [grados]')
-    ax.grid(True)
+    # sc=ax.scatter(a_samples_post,theta_samples_post,alpha=0.7,c=np.arange(len(a_samples_post)),cmap='rainbow')
+    # plt.colorbar(sc, ax=ax, label='Índice de Muestra')
+    # ax.set_xlabel('a')
+    # ax.set_ylabel('theta [grados]')
+    # ax.grid(True)
 
-    plt.suptitle("Evolución de la cadena de Metropolis (30% Burn-in)", fontsize=16)
-    plt.tight_layout()
-    plt.show()
-
-    # # --- Graficar histogramas de parámetros ---
-    # fig = plt.figure(figsize=(10, 8))
-    # gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
-    #                        wspace=0.05, hspace=0.05)
-    # ax_join = fig.add_subplot(gs[1, 0])
-    # counts, xedges, yedges, im = ax_join.hist2d(a_samples, theta_samples, bins=50, cmap='viridis')
-    # fig.colorbar(im, ax=ax_join, label='Cuentas')
-    # ax_join.set_title('Histograma 2D (PDF conjunta)')
-    # ax_join.set_xlabel('a')
-    # ax_join.set_ylabel('theta [grados]')
-
-    # # Marginal para a
-    # ax_a = fig.add_subplot(gs[0, 0], sharex=ax_join)
-    # a_hist, a_bins, _ = ax_a.hist(a_samples, bins=100, density=True, alpha=0.6, color='blue', label='Histograma de a')
-    # ax_a.set_title('Marginal para a')
-    # ax_a.set_ylabel('Densidad')
-    # ax_a.legend()
-    # ax_a.tick_params(labelbottom=False)
-    # pos = ax_a.get_position()
-    # ax_a.set_position([pos.x0, pos.y0 + 0.03, pos.width, pos.height])
-
-    # # Marginal para theta
-    # ax_theta = fig.add_subplot(gs[1, 1], sharey=ax_join)
-    # theta_hist, theta_bins, _ = ax_theta.hist(theta_samples, bins=100, density=True, alpha=0.6, color='green', orientation='horizontal', label='Histograma de theta')
-    # ax_theta.set_title('Marginal para theta')
-    # ax_theta.set_xlabel('Densidad')
-    # ax_theta.legend()
-    # ax_theta.tick_params(labelleft=False)   
-    # fig.suptitle("Distribución de Parámetros: Histograma Conjunto y Marginales", fontsize=14, y=0.965)
-    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+    # plt.suptitle("Evolución de la cadena de Metropolis (30% Burn-in)", fontsize=16)
+    # # plt.tight_layout()
     # plt.show()
 
+    # # --- Graficar histogramas de parámetros ---
 
-    # Histograma conjunto y marginales
-    fig = plt.figure(figsize=(10, 8))
+    # Histograma conjunto y marginales muestras fprior
+    fig1 = plt.figure(figsize=(10, 8), layout='constrained')
     gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
                         wspace=0.05, hspace=0.05)
-    ax_join = fig.add_subplot(gs[1, 0])
-    counts, xedges, yedges, im = ax_join.hist2d(a_samples, theta_samples, bins=50, cmap='viridis')
-    fig.colorbar(im, ax=ax_join, label='Cuentas')
+    ax_join = fig1.add_subplot(gs[1, 0])
+    counts, xedges, yedges, im = ax_join.hist2d(a_samples_prior, theta_samples_prior, bins=50, cmap='viridis')
+    fig1.colorbar(im, ax=ax_join, label='Cuentas')
     ax_join.set_title('Histograma 2D posterior')
-    ax_join.set_xlabel('a')
-    ax_join.set_ylabel('theta [°]')
+    ax_join.set_xlabel('a', fontsize=13)
+    ax_join.set_ylabel('theta [°]', fontsize=13)
 
     # Marginal para a
-    ax_a = fig.add_subplot(gs[0, 0], sharex=ax_join)
-    ax_a.hist(a_samples, bins=100, density=True, alpha=0.6, color='blue')
+    ax_a = fig1.add_subplot(gs[0, 0], sharex=ax_join)
+    ax_a.hist(a_samples_prior, bins=100, density=True, alpha=0.6, color='blue')
     ax_a.set_title('Marginal de a')
-    ax_a.tick_params(labelbottom=False)
+    ax_a.tick_params(labelbottom=False, labelsize=12)
 
     # Marginal para theta
-    ax_theta = fig.add_subplot(gs[1, 1], sharey=ax_join)
-    ax_theta.hist(theta_samples, bins=100, density=True, alpha=0.6, color='green', orientation='horizontal')
+    ax_theta = fig1.add_subplot(gs[1, 1], sharey=ax_join)
+    ax_theta.hist(theta_samples_prior, bins=100, density=True, alpha=0.6, color='green', orientation='horizontal')
     ax_theta.set_title('Marginal de θ')
-    ax_theta.tick_params(labelleft=False)
+    ax_theta.tick_params(labelleft=False, labelsize=12)
 
-    fig.suptitle("Posterior: TMCMC para ajuste ortogonal", fontsize=14)
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    fig1.suptitle(r"Distribución de parámetros muestras de $f_{prior}$: TMCMC para ajuste ortogonal", fontsize=16)
+    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+    
+    
+    # Histograma conjunto y marginales muestras fpost
+    fig2 = plt.figure(figsize=(10, 8), layout='constrained')
+    gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
+                        wspace=0.05, hspace=0.05)
+    ax_join = fig2.add_subplot(gs[1, 0])
+    counts, xedges, yedges, im = ax_join.hist2d(a_samples_post, theta_samples_post, bins=50, cmap='viridis')
+    fig2.colorbar(im, ax=ax_join, label='Cuentas')
+    ax_join.set_title('Histograma 2D posterior')
+    ax_join.set_xlabel('a', fontsize=13)
+    ax_join.set_ylabel('theta [°]', fontsize=13)
+
+    # Marginal para a
+    ax_a = fig2.add_subplot(gs[0, 0], sharex=ax_join)
+    ax_a.hist(a_samples_post, bins=100, density=True, alpha=0.6, color='blue')
+    ax_a.set_title('Marginal de a')
+    ax_a.tick_params(labelbottom=False, labelsize=12)
+
+    # Marginal para theta
+    ax_theta = fig2.add_subplot(gs[1, 1], sharey=ax_join)
+    ax_theta.hist(theta_samples_post, bins=100, density=True, alpha=0.6, color='green', orientation='horizontal')
+    ax_theta.set_title('Marginal de θ')
+    ax_theta.tick_params(labelleft=False, labelsize=12)
+
+    fig2.suptitle(r"Distribución de parámetros muestras de $f_{post}$: TMCMC para ajuste ortogonal", fontsize=16)
+    # plt.tight_layout(rect=[0, 0, 1, 0.95])
+    
+    
     plt.show()
