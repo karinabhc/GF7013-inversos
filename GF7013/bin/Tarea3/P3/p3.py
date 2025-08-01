@@ -20,30 +20,13 @@ sys.path.append(GF7013_path)
 
 # Importaciones desde GF7013
 from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
-from GF7013.models.ajuste_ortogonal_recta.forward import forward
+from GF7013.models.ajuste_ortogonal_recta.forward import forward_ensemble
 from GF7013.model_parameters import ensemble
 from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD
 from GF7013.probability_functions.pdf.pdf_normal import pdf_normal
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.sampling.tmcmc.tmcmc import tmcmc_pool
-class forward_ensemble(forward):   
-    def eval(self, m):
-        """
-        Computes a prediction of the model parameters (see description in this
-        module docstring).
-        - m = NP.array([a, theta]) with theta in degrees (both float quantities). 
-          -> a is the distance between straight line to origin of coordinate system and 
-          -> theta is the orientation of the straight line measured counter-clockwise 
-            measured from x axis. 
-        """
-        if isinstance(m, ensemble):
-            dpred = np.zeros((m.Nmodels, len(self.x_obs)))
-            for i in range(m.Nmodels):
-                dpred = super().eval(m.m_set[i, :])
-            return dpred
-        else:
-            return super().eval(m)
         
 if __name__ == "__main__":
     N = 50

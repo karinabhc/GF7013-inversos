@@ -14,6 +14,8 @@ Departamento de Geofisica - FCFM - Universidad de Chile
 """
 COMPLETAR = None
 from . import recta
+from GF7013.model_parameters import ensemble
+import numpy as np
 
 class forward(object):
     """
@@ -54,3 +56,22 @@ class forward(object):
         dpred = deltas / sigma_deltas
 
         return dpred
+
+class forward_ensemble(forward):   
+    def eval(self, m):
+        """
+        Computes a prediction of the model parameters (see description in this
+        module docstring).
+        - m = NP.array([a, theta]) with theta in degrees (both float quantities). 
+          -> a is the distance between straight line to origin of coordinate system and 
+          -> theta is the orientation of the straight line measured counter-clockwise 
+            measured from x axis. 
+        """
+        if isinstance(m, ensemble):
+            dpred = np.zeros((m.Nmodels, len(self.x_obs)))
+            for i in range(m.Nmodels):
+                dpred[i, :] = super().eval(m.m_set[i, :])
+            return dpred
+        else:
+            return super().eval(m)
+        

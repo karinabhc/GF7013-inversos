@@ -22,7 +22,7 @@ sys.path.append(pythonpackagesfolder)
 # modelo directo de la recta
 #from GF7013.models.ajuste_ortogonal_recta import recta
 from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
-from GF7013.models.ajuste_ortogonal_recta.forward import forward
+from GF7013.models.ajuste_ortogonal_recta.forward import forward_ensemble
 from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD  # Para la distribución a priori
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
 from GF7013.probability_functions.pdf.pdf_normal import pdf_normal  # Para la distribución de los residuos
@@ -71,7 +71,7 @@ if __name__ == "__main__":
   fprior = pdf_uniform_nD(par)
 
   ############## Creo que de aqui pa bajo ojito
-  modelo_forward = forward(x_obs=x_obs, y_obs=y_obs, sigma_x=sigma_x, sigma_y=sigma_y)
+  modelo_forward = forward_ensemble(x_obs=x_obs, y_obs=y_obs, sigma_x=sigma_x, sigma_y=sigma_y)
 
   # Crear la distribución de probabilidad para los datos (residuos normalizados)
   # Como forward.eval() devuelve residuos normalizados, usamos una normal estándar
