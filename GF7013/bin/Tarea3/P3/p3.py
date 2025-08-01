@@ -23,7 +23,7 @@ from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
 from GF7013.models.ajuste_ortogonal_recta.forward import forward_ensemble
 from GF7013.model_parameters import ensemble
 from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD
-from GF7013.probability_functions.pdf.pdf_normal import pdf_normal
+from GF7013.probability_functions.pdf.pdf_normal import pdf_normal, pdf_normal_Nmodels
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.sampling.tmcmc.tmcmc import tmcmc_pool
@@ -72,10 +72,12 @@ if __name__ == "__main__":
     # El número de parámetros debe coincidir con el número de observaciones
     n_obs = len(x_obs)
 
+    Nmodels = 50_000
+
 
     # Parámetros teóricos
     par = {'mu': np.zeros(n_obs), 'cov': np.eye(n_obs)}
-    pdf = pdf_normal(par)
+    pdf = pdf_normal_Nmodels(par, Nmodels=Nmodels)
 
     # Crear la función de verosimilitud usando tu clase del paquete
     # Función de verosimilitud
@@ -93,7 +95,6 @@ if __name__ == "__main__":
 
 
     # Ensemble inicial
-    Nmodels = 50_000
     beta0 = 0.0
     m0 = ensemble(Npar=2, Nmodels=Nmodels, use_log_likelihood=use_log_likelihood, beta=beta0)
     m0.m_set = fprior.draw(Nmodels).T

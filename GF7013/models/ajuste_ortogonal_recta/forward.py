@@ -16,6 +16,7 @@ COMPLETAR = None
 from . import recta
 from GF7013.model_parameters import ensemble
 import numpy as np
+from tqdm import tqdm
 
 class forward(object):
     """
@@ -69,7 +70,7 @@ class forward_ensemble(forward):
         """
         if isinstance(m, ensemble):
             dpred = np.zeros((m.Nmodels, len(self.x_obs)))
-            for i in range(m.Nmodels):
+            for i in tqdm(range(m.Nmodels)):
                 dpred[i, :] = super().eval(m.m_set[i, :])
             return dpred
         else:

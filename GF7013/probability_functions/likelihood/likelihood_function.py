@@ -56,4 +56,3 @@ class likelihood_function(object):
         dpred = self.forward.eval(m)
         return self.pdf_data.log_likelihood(dpred)
 
-

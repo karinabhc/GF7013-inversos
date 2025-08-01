@@ -65,7 +65,7 @@ class pdf_normal(pdf_base):
 
 
     ####
-    def __check_x(self, x):
+    def _check_x(self, x):
         """
         Check that the array x has the correct shape and size
         array must be a single column 2D array or a 1D array
@@ -89,7 +89,7 @@ class pdf_normal(pdf_base):
         likelihood ( DO NOT TAKE THE LOGARITHM OF THE PDF). You must program the formula.
 
         """
-        x = self.__check_x(x)
+        x = self._check_x(x)
         misfit = x - self.mu
         log_likelihood_value =-0.5 * misfit.T @ self.inv_cov @ misfit #prod matricial
         return log_likelihood_value
@@ -158,3 +158,95 @@ class pdf_normal(pdf_base):
         
         return sample
            
+
+
+
+
+class pdf_normal_Nmodels(pdf_normal):
+    """
+    Defines a class for a n-dimensional multivariate normal N(mu, cov) probability 
+    function class.
+    """
+    ###
+    def __init__(self, par, rng = None, Nmodels=1):
+        """
+        par: a dictionary containing the parameters that define the pdf.
+        allowed keys are:
+           'mu': a 1D array with the expected value (mean) of the normal pdf.
+                 all values must be finite.
+           'cov': a 2D array with the covariance matrix of the normal pdf.
+                  must be a symmetric, nonsingular and positive definite matrix.
+        rng: an instance of a numpy random number generator. If rng is None we use
+            numpy.random.default_rng()
+        """
+        # The base class constructor assigns self.par = par
+        super().__init__(par, rng)
+
+        self.type = 'multivariate normal for multiple models'
+        self.Nmodels = Nmodels
+
+    ####
+    def _check_x(self, x):
+        """
+        Check that the array x has the correct shape and size
+        array must be a single column 2D array or a 1D array
+        # """
+
+        if len(x) == self.Nmodels:
+            xs = np.zeros((self.Nmodels, self.N))
+            for i in range(self.Nmodels):
+                xs[i, :] = super()._check_x(x[i])
+            return  xs
+        else:
+            return super()._check_x(x)
+
+    ####
+    def _log_likelihood(self, x):
+        """
+        computes the base e logarithm of the likelihood of the vector value x. 
+        x must be a numpy array of 1 D, or a column vector 2D numpy array.
+        
+        TODO: For the homework please compute directly the logarithm of the (unnormalized)
+        likelihood ( DO NOT TAKE THE LOGARITHM OF THE PDF). You must program the formula.
+
+        """
+        
+        if len(x) == self.Nmodels:
+            x = self._check_x(x)
+            log_likelihood = np.zeros(self.Nmodels)
+            for i in range(self.Nmodels):
+                misfit = x[i, :] - self.mu
+                log_likelihood_value =-0.5 * misfit.T @ self.inv_cov @ misfit #prod matricial
+                log_likelihood[i] = log_likelihood_value
+            return log_likelihood
+        else:
+            return super()._log_likelihood(x)
+        
+    ####
+    def _likelihood(self, x):
+        """
+        computes the (unnormalized) likelihood of the vector value x. 
+        x must be a numpy array of 1 D.
+
+        TODO: A hint: use what you already coded!. 
+        
+        """
+        LogLike = self._log_likelihood(x)
+
+        return  np.exp(LogLike)
+    
+    ####
+    def _log_pdf(self, x):
+        """
+        computes the value of the probability density function (i.e., normalized pdf) 
+        for x.
+        """
+        return self._log_likelihood(x) + self.log_normalization
+        
+    ####
+    def _pdf(self, x):
+        """
+        computes the value of the probability density function (i.e., normalized pdf) 
+        for x.
+        """
+        return  self._likelihood(x) * self.normalization
