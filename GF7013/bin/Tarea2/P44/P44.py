@@ -12,12 +12,11 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-
-# importar modulos relevantes del paquete GF7013
-pythonpackagesfolder = '../../../../' # no modificar si no se mueve de carpeta este notebook
 import sys
-sys.path.append(pythonpackagesfolder)
+# Setup import path
+this_module_folder = os.path.dirname(os.path.abspath(__file__))
+GF7013_path = os.path.abspath(os.path.join(this_module_folder, '../../../..'))
+sys.path.append(GF7013_path)
 
 # modelo directo de la recta
 #from GF7013.models.ajuste_ortogonal_recta import recta
@@ -25,7 +24,7 @@ from GF7013.bin.Tarea2.P1.datos import obtener_datos_elipses
 from GF7013.models.ajuste_ortogonal_recta.forward import forward_ensemble
 from GF7013.probability_functions.pdf.pdf_uniform_nD import pdf_uniform_nD  # Para la distribución a priori
 from GF7013.probability_functions.likelihood.likelihood_function import likelihood_function
-from GF7013.probability_functions.pdf.pdf_normal import pdf_normal  # Para la distribución de los residuos
+from GF7013.probability_functions.pdf.pdf_normal import pdf_normal_Nmodels  # Para la distribución de los residuos
 from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.sampling.metropolis_in_parallel import metropolis_in_parallel_POOL, metropolis_in_parallel_SERIAL
 import matplotlib.gridspec as gridspec
@@ -33,7 +32,8 @@ import matplotlib.gridspec as gridspec
 from GF7013.model_parameters import ensemble
 
 if __name__ == "__main__":
-
+  NumSamples = int(5e4)
+  NumBurnIn = int(0.3 * NumSamples)
   N = 50
   semi_eje_mayor = 20
   semi_eje_menor = 2
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
   # Parámetros teóricos
   par = {'mu': np.zeros(n_obs), 'cov': np.eye(n_obs)}
-  pdf = pdf_normal(par)
+  pdf = pdf_normal_Nmodels(par, Nmodels=NumSamples)
 
   # Crear la función de verosimilitud usando tu clase del paquete
   likelihood_fun = likelihood_function(forward=modelo_forward, pdf_data=pdf)
@@ -100,8 +100,7 @@ if __name__ == "__main__":
 
 
   # Parámetros del Metropolis
-  NumSamples = int(5e4)
-  NumBurnIn = int(0.3 * NumSamples)
+
   #NumBurnIn = 0
   numStepChains=300
   use_log_likelihood = True
