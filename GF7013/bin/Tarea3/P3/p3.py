@@ -29,12 +29,12 @@ from GF7013.sampling.metropolis.proposal_normal import proposal_normal
 from GF7013.sampling.tmcmc.tmcmc import tmcmc_pool
         
 if __name__ == "__main__":
-    N = 50
-    semi_eje_mayor = 20
+    N = 25
+    semi_eje_mayor = 8
     semi_eje_menor = 2
     alpha = 45
     delta_x = 0
-    delta_y = 0
+    delta_y = 4
     desviacion_estandar_x = 1.0
     desviacion_estandar_y = 1.0
 

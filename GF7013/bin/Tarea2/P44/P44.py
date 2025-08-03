@@ -34,12 +34,12 @@ from GF7013.model_parameters import ensemble
 if __name__ == "__main__":
   NumSamples = int(5e4)
   NumBurnIn = int(0.3 * NumSamples)
-  N = 50
-  semi_eje_mayor = 20
+  N = 25
+  semi_eje_mayor = 8
   semi_eje_menor = 2
   alpha = 45
   delta_x = 0
-  delta_y = 0
+  delta_y = 4
   desviacion_estandar_x = 1.0
   desviacion_estandar_y = 1.0
 

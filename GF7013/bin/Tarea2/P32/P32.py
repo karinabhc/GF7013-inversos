@@ -20,12 +20,12 @@ from GF7013.sampling.metropolis.metropolis import metropolis, _fpost,_log_fpost
 import matplotlib.gridspec as gridspec
 
 
-N = 50
-semi_eje_mayor = 20
+N = 25
+semi_eje_mayor = 8
 semi_eje_menor = 2
 alpha = 45
 delta_x = 0
-delta_y = 0
+delta_y = 4
 desviacion_estandar_x = 1.0
 desviacion_estandar_y = 1.0
 
