@@ -137,7 +137,7 @@ if __name__ == "__main__":
   sc=ax.scatter(a_samples,theta_samples,alpha=0.7,c=np.arange(len(a_samples)),cmap='rainbow')
   plt.colorbar(sc, ax=ax, label='Índice de Muestra')
   ax.set_xlabel('a')
-  ax.set_ylabel('theta [grados]')
+  ax.set_ylabel(r'$\theta$ [grados]')
   ax.grid(True)
 
   plt.suptitle("Evolución de la cadena de Metropolis (30% Burn-in)", fontsize=16)

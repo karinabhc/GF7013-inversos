@@ -119,25 +119,28 @@ if __name__ == "__main__":
     a_samples_post = m_final.m_set[:, 0]
     theta_samples_post = m_final.m_set[:, 1]
 
+    # guarda informacion de las muestras a plotear (por si falla el plot)
+    np.save('a_samples_prior.npy', a_samples_prior)
+    np.save('theta_samples_prior.npy', theta_samples_prior)
+    np.save('a_samples_post.npy', a_samples_post)
+    np.save('theta_samples_post.npy', theta_samples_post)
 
-    # # --- Graficar evolución de parámetros ---
-    # fig = plt.figure(figsize=(10, 6), layout='constrained')
-    # ax = fig.add_subplot(111)
+    # --- Graficar evolución de parámetros ---
+    fig = plt.figure(figsize=(10, 6))
+    ax = fig.add_subplot(111)
 
-    # sc=ax.scatter(a_samples_post,theta_samples_post,alpha=0.7,c=np.arange(len(a_samples_post)),cmap='rainbow')
-    # plt.colorbar(sc, ax=ax, label='Índice de Muestra')
-    # ax.set_xlabel('a')
-    # ax.set_ylabel('theta [grados]')
-    # ax.grid(True)
+    sc=ax.scatter(a_samples_post,theta_samples_post,alpha=0.7,c=np.arange(len(theta_samples_post)),cmap='rainbow')
+    fig.colorbar(sc, ax=ax, label='Índice de Muestra')
+    ax.set_xlabel('a')
+    ax.set_ylabel(r'$\theta$ [grados]')
+    ax.grid(True)
 
-    # plt.suptitle("Evolución de la cadena de Metropolis (30% Burn-in)", fontsize=16)
-    # # plt.tight_layout()
-    # plt.show()
+    fig.suptitle("Evolución de la cadena de Metropolis (30% Burn-in)", fontsize=16)
+    fig.tight_layout()
+    fig.savefig('figures/P3_T3_cadena.png')
 
-    # # --- Graficar histogramas de parámetros ---
-
-    # Histograma conjunto y marginales muestras fprior
-    fig1 = plt.figure(figsize=(10, 8), layout='constrained')
+    # --- Graficar histogramas de parámetros ---
+    fig1 = plt.figure(figsize=(10, 8))
     gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
                         wspace=0.05, hspace=0.05)
     ax_join = fig1.add_subplot(gs[1, 0])
@@ -152,6 +155,8 @@ if __name__ == "__main__":
     ax_a.hist(a_samples_prior, bins=100, density=True, alpha=0.6, color='blue')
     ax_a.set_title('Marginal de a')
     ax_a.tick_params(labelbottom=False, labelsize=12)
+    pos = ax_a.get_position()
+    ax_a.set_position([pos.x0, pos.y0 + 0.03, pos.width, pos.height])
 
     # Marginal para theta
     ax_theta = fig1.add_subplot(gs[1, 1], sharey=ax_join)
@@ -159,12 +164,12 @@ if __name__ == "__main__":
     ax_theta.set_title('Marginal de θ')
     ax_theta.tick_params(labelleft=False, labelsize=12)
 
-    fig1.suptitle(r"Distribución de parámetros muestras de $f_{prior}$: TMCMC para ajuste ortogonal", fontsize=16)
-    # plt.tight_layout(rect=[0, 0, 1, 0.95])
-    
-    
+    fig1.suptitle(r"Distribución de parámetros muestras de $f_{prior}$: TMCMC para ajuste ortogonal", fontsize=16, y=0.965)
+
+    fig1.savefig('figures/P3_T3_fprior.png')
+
     # Histograma conjunto y marginales muestras fpost
-    fig2 = plt.figure(figsize=(10, 8), layout='constrained')
+    fig2 = plt.figure(figsize=(10, 8))
     gs = gridspec.GridSpec(2, 2, width_ratios=[4, 1], height_ratios=[1, 4],
                         wspace=0.05, hspace=0.05)
     ax_join = fig2.add_subplot(gs[1, 0])
@@ -172,13 +177,15 @@ if __name__ == "__main__":
     fig2.colorbar(im, ax=ax_join, label='Cuentas')
     ax_join.set_title('Histograma 2D posterior')
     ax_join.set_xlabel('a', fontsize=13)
-    ax_join.set_ylabel('theta [°]', fontsize=13)
+    ax_join.set_ylabel(r'$\theta$ [°]', fontsize=13)
 
     # Marginal para a
     ax_a = fig2.add_subplot(gs[0, 0], sharex=ax_join)
     ax_a.hist(a_samples_post, bins=100, density=True, alpha=0.6, color='blue')
     ax_a.set_title('Marginal de a')
     ax_a.tick_params(labelbottom=False, labelsize=12)
+    pos = ax_a.get_position()
+    ax_a.set_position([pos.x0, pos.y0 + 0.03, pos.width, pos.height])
 
     # Marginal para theta
     ax_theta = fig2.add_subplot(gs[1, 1], sharey=ax_join)
@@ -186,8 +193,7 @@ if __name__ == "__main__":
     ax_theta.set_title('Marginal de θ')
     ax_theta.tick_params(labelleft=False, labelsize=12)
 
-    fig2.suptitle(r"Distribución de parámetros muestras de $f_{post}$: TMCMC para ajuste ortogonal", fontsize=16)
-    # plt.tight_layout(rect=[0, 0, 1, 0.95])
-    
-    
+    fig2.suptitle(r"Distribución de parámetros muestras de $f_{post}$: TMCMC para ajuste ortogonal", fontsize=16, y=0.965)
+    fig2.savefig('figures/P3_T3_fpost.png')
+
     plt.show()
